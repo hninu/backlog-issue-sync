@@ -47,6 +47,8 @@ describe('main.ts', () => {
   it('issueイベント以外は失敗で終わるニャ', async () => {
     github.context.payload = {}
     await run()
-    expect(core.setFailed).toHaveBeenCalledWith('このアクションはissueイベントでのみ動作するニャ')
+    expect(core.setFailed).toHaveBeenCalledWith(
+      'このアクションはissueイベントでのみ動作するニャ'
+    )
   })
 })

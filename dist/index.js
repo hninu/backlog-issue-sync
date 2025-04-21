@@ -31242,12 +31242,7 @@ async function run() {
             return;
         }
         const issue = payload.issue;
-        // issueのタイトル・番号・状態などを出力ニャ
-        coreExports.info(`issue番号: ${issue.number}`);
-        coreExports.info(`タイトル: ${issue.title}`);
-        coreExports.info(`状態: ${issue.state}`);
-        coreExports.info(`作成者: ${issue.user?.login}`);
-        coreExports.info(`URL: ${issue.html_url}`);
+        coreExports.debug(`issue: ${issue}`);
     }
     catch (error) {
         if (error instanceof Error)
