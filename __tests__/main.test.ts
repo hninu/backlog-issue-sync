@@ -7,11 +7,11 @@
  */
 import { jest } from '@jest/globals'
 import * as core from '../__fixtures__/core.js'
-import { wait } from '../__fixtures__/wait.js'
+import * as github from '../__fixtures__/github.js'
 
 // Mocks should be declared before the module being tested is imported.
 jest.unstable_mockModule('@actions/core', () => core)
-jest.unstable_mockModule('../src/wait.js', () => ({ wait }))
+jest.unstable_mockModule('@actions/github', () => github)
 
 // The module being tested should be imported dynamically. This ensures that the
 // mocks are used in place of any actual dependencies.
@@ -19,44 +19,34 @@ const { run } = await import('../src/main.js')
 
 describe('main.ts', () => {
   beforeEach(() => {
-    // Set the action's inputs as return values from core.getInput().
-    core.getInput.mockImplementation(() => '500')
-
-    // Mock the wait function so that it does not actually wait.
-    wait.mockImplementation(() => Promise.resolve('done!'))
-  })
-
-  afterEach(() => {
+    // github.context.payloadを都度書き換えられるように初期化
+    github.context.payload = {}
     jest.resetAllMocks()
   })
 
-  it('Sets the time output', async () => {
+  it('issueイベントで情報をログ出力するニャ', async () => {
+    github.context.payload = {
+      issue: {
+        number: 123,
+        title: 'テストissue',
+        state: 'open',
+        user: { login: 'cat-user' },
+        html_url: 'https://github.com/example/repo/issues/123'
+      }
+    }
+
     await run()
 
-    // Verify the time output was set.
-    expect(core.setOutput).toHaveBeenNthCalledWith(
-      1,
-      'time',
-      // Simple regex to match a time string in the format HH:MM:SS.
-      expect.stringMatching(/^\d{2}:\d{2}:\d{2}/)
-    )
+    expect(core.info).toHaveBeenCalledWith('issue番号: 123')
+    expect(core.info).toHaveBeenCalledWith('タイトル: テストissue')
+    expect(core.info).toHaveBeenCalledWith('状態: open')
+    expect(core.info).toHaveBeenCalledWith('作成者: cat-user')
+    expect(core.info).toHaveBeenCalledWith('URL: https://github.com/example/repo/issues/123')
   })
 
-  it('Sets a failed status', async () => {
-    // Clear the getInput mock and return an invalid value.
-    core.getInput.mockClear().mockReturnValueOnce('this is not a number')
-
-    // Clear the wait mock and return a rejected promise.
-    wait
-      .mockClear()
-      .mockRejectedValueOnce(new Error('milliseconds is not a number'))
-
+  it('issueイベント以外は失敗で終わるニャ', async () => {
+    github.context.payload = {}
     await run()
-
-    // Verify that the action was marked as failed.
-    expect(core.setFailed).toHaveBeenNthCalledWith(
-      1,
-      'milliseconds is not a number'
-    )
+    expect(core.setFailed).toHaveBeenCalledWith('このアクションはissueイベントでのみ動作するニャ')
   })
 })
