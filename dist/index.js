@@ -31242,7 +31242,7 @@ async function run() {
             return;
         }
         const issue = payload.issue;
-        coreExports.debug(`issue: ${issue}`);
+        coreExports.info(`issue: ${JSON.stringify(issue)}`);
     }
     catch (error) {
         if (error instanceof Error)

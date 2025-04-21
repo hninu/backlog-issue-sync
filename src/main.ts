@@ -17,7 +17,7 @@ export async function run(): Promise<void> {
 
     const issue = payload.issue
 
-    core.debug(`issue: ${issue}`)
+    core.info(`issue: ${JSON.stringify(issue)}`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
