@@ -17,14 +17,7 @@ export async function run(): Promise<void> {
 
 		const issue = payload.issue;
 
-		core.info(`issue: ${issue}`);
-		core.info(`タイトル: ${issue.title}`);
-		core.info(`本文: ${issue.body}`);
-		core.info(`作成日: ${issue.created_at}`);
-		core.info(`更新日: ${issue.updated_at}`);
-		core.info(`状態: ${issue.state}`);
-		core.info(`作成者: ${issue.user?.login}`);
-		core.info(`URL: ${issue.html_url}`);
+		core.debug(`issue: ${issue}`);
 	} catch (error) {
 		if (error instanceof Error) core.setFailed(error.message);
 	}
