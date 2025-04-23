@@ -1,4 +1,5 @@
 import backlogjs from "backlog-js";
+import { fromPromise } from "neverthrow";
 import type { BacklogOptions, GithubIssue } from "../../type.js";
 
 export class Backlog {
@@ -18,8 +19,16 @@ export class Backlog {
 		const project = await this.backlog.getProject(this.opts.projectIdOrKey);
 		this.projectId = project.id;
 
-		const issueTypes = await this.backlog.getIssueTypes(this.projectId);
-		const foundType = issueTypes.find(
+		const issueTypes = await fromPromise(
+			this.backlog.getIssueTypes(this.projectId),
+			(e) => e as Error,
+		);
+
+		if (issueTypes.isErr()) {
+			throw new Error(`getIssueTypes failed: ${this.opts.issueTypeIdOrName}`);
+		}
+
+		const foundType = issueTypes.value.find(
 			(t) =>
 				t.name === this.opts.issueTypeIdOrName ||
 				t.id === Number(this.opts.issueTypeIdOrName),
@@ -30,8 +39,16 @@ export class Backlog {
 
 		this.issueType = foundType;
 
-		const priorities = await this.backlog.getPriorities();
-		const foundPriority = priorities.find(
+		const priorities = await fromPromise(
+			this.backlog.getPriorities(),
+			(e) => e as Error,
+		);
+
+		if (priorities.isErr()) {
+			throw new Error(`getPriorities failed: ${this.opts.priorityIdOrName}`);
+		}
+
+		const foundPriority = priorities.value.find(
 			(p) =>
 				p.name === this.opts.priorityIdOrName ||
 				p.id === Number(this.opts.priorityIdOrName),
@@ -51,8 +68,18 @@ export class Backlog {
 			throw new Error("issueType or priority not found");
 		}
 
-		const initialStatus = await this.backlog.getProjectStatuses(this.projectId);
-		const foundInitialStatus = initialStatus.find(
+		const initialStatus = await fromPromise(
+			this.backlog.getProjectStatuses(this.projectId),
+			(e) => e as Error,
+		);
+
+		if (initialStatus.isErr()) {
+			throw new Error(
+				`getProjectStatuses failed: ${this.opts.initialStatusIdOrName}`,
+			);
+		}
+
+		const foundInitialStatus = initialStatus.value.find(
 			(s) =>
 				s.name === this.opts.initialStatusIdOrName ||
 				s.id === Number(this.opts.initialStatusIdOrName),
@@ -96,11 +123,18 @@ export class Backlog {
 	public async issueClose(githubIssue: GithubIssue) {
 		const key = Backlog.extractBacklogTag(githubIssue.body);
 
-		const completedStatus = await this.backlog.getProjectStatuses(
-			this.projectId,
+		const completedStatus = await fromPromise(
+			this.backlog.getProjectStatuses(this.projectId),
+			(e) => e as Error,
 		);
 
-		const foundCompletedStatus = completedStatus.find(
+		if (completedStatus.isErr()) {
+			throw new Error(
+				`getProjectStatuses failed: ${this.opts.completedStatusIdOrName}`,
+			);
+		}
+
+		const foundCompletedStatus = completedStatus.value.find(
 			(s) =>
 				s.name === this.opts.completedStatusIdOrName ||
 				s.id === Number(this.opts.completedStatusIdOrName),

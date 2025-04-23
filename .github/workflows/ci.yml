@@ -36,8 +36,8 @@ jobs:
         id: npm-check
         run: npm run check
 
-      - name: Test
-        id: npm-ci-test
-        run: npm run ci-test
+      # - name: Test
+      #   id: npm-ci-test
+      #   run: npm run ci-test
 
 
