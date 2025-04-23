@@ -11,11 +11,9 @@ import type { GithubIssue } from "./type.js";
 
 export async function run(): Promise<void> {
 	try {
-		const { payload, repo } = github.context;
+		console.log("github context:", github.context);
 
-		if (!payload.issue) {
-			return core.setFailed("このアクションはissueイベントでのみ動作するニャ");
-		}
+		const { payload, repo } = github.context;
 
 		const issue = payload.issue as GithubIssue;
 
@@ -30,6 +28,8 @@ export async function run(): Promise<void> {
 		if (payload.state === "closed") {
 			return await handleClosed({ issue });
 		}
+
+		core.setFailed("このアクションはissueイベントでのみ動作するニャ");
 	} catch (error) {
 		if (error instanceof Error) core.setFailed(error.message);
 	}
