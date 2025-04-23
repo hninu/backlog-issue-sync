@@ -10,7 +10,7 @@ branding:
 # Define your inputs here.
 inputs:
   backlog-host:
-    description: 'Backlog host name (例: xxxxx.backlog.jp)'
+    description: 'Backlog host name (e.g.: xxxxx.backlog.jp)'
     required: true
   backlog-api-key:
     description: 'Backlog API key'
@@ -34,7 +34,7 @@ inputs:
     description: 'Optional prefix to add to the Backlog issue summary'
     required: false
   github-token:
-    description: 'GitHub token (e.g. ${{ secrets.GITHUB_TOKEN }})'
+    description: 'GitHub token'
     required: true
 
 runs:
