@@ -6,5 +6,5 @@ pre-commit:
   parallel: true
   jobs:
     - run: npx biome check {staged_files} --write
-      glob: "*.{js,ts,jsx,tsx,json}"
+      glob: "*.{ts,tsx,json}"
       stage_fixed: true

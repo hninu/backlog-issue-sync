@@ -126435,10 +126435,8 @@ async function handleReopen({ issue }) {
 
 async function run() {
     try {
+        console.log("github context:", githubExports.context);
         const { payload, repo } = githubExports.context;
-        if (!payload.issue) {
-            return coreExports.setFailed("このアクションはissueイベントでのみ動作するニャ");
-        }
         const issue = payload.issue;
         if (payload.state === "open" && payload.state_reason === "reopened") {
             return await handleReopen({ issue });
@@ -126449,6 +126447,7 @@ async function run() {
         if (payload.state === "closed") {
             return await handleClosed({ issue });
         }
+        coreExports.setFailed("このアクションはissueイベントでのみ動作するニャ");
     }
     catch (error) {
         if (error instanceof Error)
