@@ -126380,19 +126380,21 @@ function getBacklogOptions() {
     return {
         host: coreExports.getInput("backlog-host", { required: true }),
         apiKey: coreExports.getInput("backlog-api-key", { required: true }),
-        projectIdOrKey: coreExports.getInput("backlog-project-id-or-key", {
+        projectIdOrKey: coreExports.getInput("backlog-project-key", {
             required: true,
         }),
-        issueTypeIdOrName: coreExports.getInput("backlog-issue-type-id-or-name", {
+        issueTypeIdOrName: coreExports.getInput("backlog-issue-type", {
             required: true,
         }),
-        priorityIdOrName: coreExports.getInput("backlog-priority-id-or-name", {
+        priorityIdOrName: coreExports.getInput("backlog-priority", {
             required: true,
         }),
-        initialStatusIdOrName: coreExports.getInput("backlog-initial-status-id-or-name", {
+        initialStatusIdOrName: coreExports.getInput("backlog-initial-status", {
             required: true,
         }),
-        completedStatusIdOrName: coreExports.getInput("backlog-completed-status-id-or-name", { required: true }),
+        completedStatusIdOrName: coreExports.getInput("backlog-completed-status", {
+            required: true,
+        }),
         summaryPrefix: coreExports.getInput("backlog-summary-prefix", { required: false }) || undefined,
     };
 }

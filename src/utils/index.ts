@@ -5,22 +5,21 @@ export function getBacklogOptions(): BacklogOptions {
 	return {
 		host: core.getInput("backlog-host", { required: true }),
 		apiKey: core.getInput("backlog-api-key", { required: true }),
-		projectIdOrKey: core.getInput("backlog-project-id-or-key", {
+		projectIdOrKey: core.getInput("backlog-project-key", {
 			required: true,
 		}),
-		issueTypeIdOrName: core.getInput("backlog-issue-type-id-or-name", {
+		issueTypeIdOrName: core.getInput("backlog-issue-type", {
 			required: true,
 		}),
-		priorityIdOrName: core.getInput("backlog-priority-id-or-name", {
+		priorityIdOrName: core.getInput("backlog-priority", {
 			required: true,
 		}),
-		initialStatusIdOrName: core.getInput("backlog-initial-status-id-or-name", {
+		initialStatusIdOrName: core.getInput("backlog-initial-status", {
 			required: true,
 		}),
-		completedStatusIdOrName: core.getInput(
-			"backlog-completed-status-id-or-name",
-			{ required: true },
-		),
+		completedStatusIdOrName: core.getInput("backlog-completed-status", {
+			required: true,
+		}),
 		summaryPrefix:
 			core.getInput("backlog-summary-prefix", { required: false }) || undefined,
 	};
