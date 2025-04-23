@@ -15,6 +15,7 @@ export interface GithubIssue {
 	title: string;
 	html_url: string;
 	body?: string;
-	state: string;
+	state: "open" | "closed";
+	state_reason: string | null;
 	user: { login: string };
 }
