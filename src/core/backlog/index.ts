@@ -1,25 +1,5 @@
 import backlogjs from "backlog-js";
-
-export interface BacklogOptions {
-	host: string;
-	apiKey: string;
-	projectIdOrKey: string;
-	issueTypeIdOrName: string;
-	priorityIdOrName: string;
-	initialStatusIdOrName: string;
-	completedStatusIdOrName: string;
-	summaryPrefix?: string;
-}
-
-export interface GithubIssue {
-	id: number;
-	number: number;
-	title: string;
-	html_url: string;
-	body?: string;
-	state: string;
-	user: { login: string };
-}
+import type { BacklogOptions, GithubIssue } from "../../type.js";
 
 export class Backlog {
 	private backlog: backlogjs.Backlog;
@@ -83,13 +63,18 @@ export class Backlog {
 				`initialStatus not found: ${this.opts.initialStatusIdOrName}`,
 			);
 
+		const githubTag = Backlog.makeGithubTag(
+			githubIssue.number.toString(),
+			githubIssue.html_url,
+		);
+
 		const created = await this.backlog.postIssue({
 			projectId: this.projectId,
 			issueTypeId: this.issueType.id,
 			priorityId: this.priority.id,
 			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
 			statusId: foundInitialStatus.id,
-			description: `${githubIssue.html_url}\n\n${githubIssue.body || ""}`,
+			description: `${githubTag}\n\n${githubIssue.body || ""}`,
 		});
 
 		const tag = Backlog.makeBacklogTag(created.issueKey, this.opts.host);
@@ -101,7 +86,10 @@ export class Backlog {
 		const key = Backlog.extractBacklogTag(githubIssue.body);
 		return this.backlog.patchIssue(key, {
 			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
-			description: `${githubIssue.html_url}\n\n${githubIssue.body || ""}`,
+			description: `${Backlog.makeGithubTag(
+				githubIssue.number.toString(),
+				githubIssue.html_url,
+			)}\n\n${githubIssue.body || ""}`,
 		});
 	}
 
@@ -150,5 +138,9 @@ export class Backlog {
 	public static makeBacklogTag(key: string, host: string): string {
 		const url = `${host.replace(/\/$/, "")}/view/${key}`;
 		return `backlog [#${key}](${url})`;
+	}
+
+	public static makeGithubTag(key: string, url: string): string {
+		return `github [#${key}](${url})`;
 	}
 }

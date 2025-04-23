@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { Backlog, type GithubIssue } from "./core/backlog/index.js";
+import { Backlog } from "./core/backlog/index.js";
+import type { GithubIssue } from "./type.js";
 import { getBacklogOptions, getGithubToken } from "./utils/index.js";
 
 export async function handleOpen({

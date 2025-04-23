@@ -9,15 +9,33 @@ branding:
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: Your input description here
+  backlog-host:
+    description: 'Backlog host name (例: xxxxx.backlog.jp)'
     required: true
-    default: '1000'
-
-# Define your outputs here.
-outputs:
-  time:
-    description: Your output description here
+  backlog-api-key:
+    description: 'Backlog API key'
+    required: true
+  backlog-project-key:
+    description: 'Backlog project ID or key'
+    required: true
+  backlog-issue-type:
+    description: 'Backlog issue type ID or name'
+    required: true
+  backlog-priority:
+    description: 'Backlog priority ID or name'
+    required: true
+  backlog-initial-status:
+    description: 'Backlog initial status ID or name (status applied to new issues when first created)'
+    required: true
+  backlog-completed-status:
+    description: 'Backlog completed status ID or name (status applied when closing issues)'
+    required: true
+  backlog-summary-prefix:
+    description: 'Optional prefix to add to the Backlog issue summary'
+    required: false
+  github-token:
+    description: 'GitHub token (e.g. ${{ secrets.GITHUB_TOKEN }})'
+    required: true
 
 runs:
   using: node20

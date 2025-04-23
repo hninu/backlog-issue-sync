@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
-import { Backlog, type GithubIssue } from "./core/backlog/index.js";
+import { Backlog } from "./core/backlog/index.js";
+import type { GithubIssue } from "./type.js";
 import { getBacklogOptions } from "./utils/index.js";
 
 export async function handleClosed({ issue }: { issue: GithubIssue }) {

@@ -5,9 +5,9 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 
 import { handleClosed } from "./closed.js";
-import type { GithubIssue } from "./core/backlog/index.js";
 import { handleOpen } from "./open.js";
 import { handleReopen } from "./reopen.js";
+import type { GithubIssue } from "./type.js";
 
 export async function run(): Promise<void> {
 	try {

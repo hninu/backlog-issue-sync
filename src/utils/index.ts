@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import type { BacklogOptions } from "../core/backlog/index.js";
+import type { BacklogOptions } from "../type.js";
 
 export function getBacklogOptions(): BacklogOptions {
 	return {
