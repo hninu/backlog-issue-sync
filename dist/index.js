@@ -126947,6 +126947,14 @@ async function handleClosed({ issue }) {
     coreExports.info("Backlog課題を完了にしたニャ");
 }
 
+async function handleEdit({ issue }) {
+    const opts = getBacklogOptions();
+    const backlog = new Backlog(opts);
+    await backlog.init();
+    await backlog.issueUpdate(issue);
+    coreExports.info("Backlog課題を更新したニャ");
+}
+
 async function handleOpen({ issue, repo, }) {
     const opts = getBacklogOptions();
     const token = getGithubToken();
@@ -126981,7 +126989,11 @@ async function run() {
             return await handleReopen({ issue });
         }
         if (issue.state === "open") {
-            return await handleOpen({ issue, repo });
+            const existBacklogTag = Backlog.extractBacklogTag(issue.body || "");
+            if (existBacklogTag === null) {
+                return await handleOpen({ issue, repo });
+            }
+            return await handleEdit({ issue });
         }
         if (issue.state === "closed") {
             return await handleClosed({ issue });
