@@ -30,4 +30,4 @@ jobs:
 
       - name: Install Dependencies
         id: install
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile

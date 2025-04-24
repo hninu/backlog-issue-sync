@@ -34,7 +34,7 @@ jobs:
 
       - name: Install Dependencies
         id: pnpm-ci
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Setup Ruby
         id: setup-ruby
