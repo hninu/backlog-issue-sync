@@ -18,9 +18,9 @@ export async function handleOpen({
 
 	const backlog = new Backlog(opts);
 	await backlog.init();
-	const tag = await backlog.issueCreate(issue);
+	const backlogTag = await backlog.issueCreate(issue);
 
-	const newBody = `${issue.body || ""}\n\n${tag}`;
+	const newBody = `${backlogTag}\n\n${issue.body || ""}`;
 	await octokit.rest.issues.update({
 		owner: repo.owner,
 		repo: repo.repo,
@@ -28,5 +28,5 @@ export async function handleOpen({
 		body: newBody,
 	});
 
-	core.info(`Backlog課題を新規作成し、リンクを追記したニャ: ${tag}`);
+	core.info(`Backlog課題を新規作成し、リンクを追記したニャ: ${backlogTag}`);
 }

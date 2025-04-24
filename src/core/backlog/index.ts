@@ -173,14 +173,11 @@ export class Backlog {
 		const key = Backlog.extractBacklogTag(githubIssue.body || "");
 		if (key === null) return;
 
-		const githubTag = Backlog.makeGithubTag(
-			githubIssue.number.toString(),
-			githubIssue.html_url,
-		);
+		const replaced = githubIssue.body?.replaceAll(Backlog.backlogRegex, "");
 
 		const payload: backlogjs.Option.Issue.PatchIssueParams = {
 			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
-			description: `${githubTag}\n\n${githubIssue.body || ""}`,
+			description: replaced || "",
 			statusId: this.initialStatus.id,
 		};
 
