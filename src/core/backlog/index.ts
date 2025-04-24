@@ -160,9 +160,7 @@ export class Backlog {
 			throw new Error(`postIssue failed: ${githubIssue.title}`);
 		}
 
-		const tag = Backlog.makeBacklogTag(created.value.issueKey, this.opts.host);
-
-		return tag;
+		return Backlog.makeBacklogTag(created.value.issueKey, this.opts.host);
 	}
 
 	public async issueUpdate(githubIssue: GithubIssue) {
@@ -195,6 +193,8 @@ export class Backlog {
 			console.debug(updated.error, payload);
 			throw new Error(`patchIssue failed: ${githubIssue.title}`);
 		}
+
+		return Backlog.makeBacklogTag(key, this.opts.host);
 	}
 
 	public async issueClose(githubIssue: GithubIssue) {
@@ -218,6 +218,8 @@ export class Backlog {
 			console.debug(updated.error, key, payload);
 			throw new Error(`patchIssue failed: ${githubIssue.title}`);
 		}
+
+		return Backlog.makeBacklogTag(key, this.opts.host);
 	}
 
 	/**

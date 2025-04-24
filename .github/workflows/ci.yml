@@ -21,23 +21,19 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        id: setup-node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .node-version
-          cache: npm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install Dependencies
-        id: npm-ci
-        run: npm ci
+        id: pnpm-ci
+        run: pnpm ci
 
       - name: Check
-        id: npm-check
-        run: npm run check
+        id: pnpm-check
+        run: pnpm run check
 
       # - name: Test
-      #   id: npm-ci-test
-      #   run: npm run ci-test
+      #   id: pnpm-ci-test
+      #   run: pnpm run ci-test
 
 

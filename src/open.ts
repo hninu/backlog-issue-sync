@@ -1,4 +1,3 @@
-import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { Backlog } from "./core/backlog/index.js";
 import type { GithubIssue } from "./type.js";
@@ -28,5 +27,5 @@ export async function handleOpen({
 		body: newBody,
 	});
 
-	core.info(`Backlog課題を新規作成し、リンクを追記したニャ: ${backlogTag}`);
+	return backlogTag;
 }

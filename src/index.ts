@@ -16,27 +16,29 @@ export async function run(): Promise<void> {
 		const { payload, repo } = github.context;
 
 		const issue = payload.issue as GithubIssue;
-		console.log("issue: ", issue);
+		console.info("issue: ", issue);
 
 		if (issue.state === "open" && issue.state_reason === "reopened") {
-			return await handleReopen({ issue });
+			const tag = await handleReopen({ issue });
+			return core.info(`Finished handling reopened issue: ${tag}`);
 		}
 
 		if (issue.state === "open") {
 			const existBacklogTag = Backlog.extractBacklogTag(issue.body || "");
 
 			if (existBacklogTag === null) {
-				return await handleOpen({ issue, repo });
+				const tag = await handleOpen({ issue, repo });
+				return core.info(`Finished handling opened issue: ${tag}`);
 			}
 
-			return await handleEdit({ issue });
+			const tag = await handleEdit({ issue });
+			return core.info(`Finished handling edited issue: ${tag}`);
 		}
 
 		if (issue.state === "closed") {
-			return await handleClosed({ issue });
+			const tag = await handleClosed({ issue });
+			return core.info(`Finished handling closed issue: ${tag}`);
 		}
-
-		core.setFailed("このアクションはissueイベントでのみ動作するニャ");
 	} catch (error) {
 		if (error instanceof Error) core.setFailed(error.message);
 	}
