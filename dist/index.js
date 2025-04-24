@@ -126769,6 +126769,10 @@ class Backlog {
     projectId = 0;
     issueType;
     priority;
+    initialStatus;
+    completedStatus;
+    static backlogRegex = /backlog\s+\[#([A-Z0-9\-_]+)\]\(.*\)/i;
+    static githubRegex = /github\s+\[#(\d+)\]\(https:\/\/github.com\/\w+\/\w+\/issues\/\d+\)/i;
     constructor(opts) {
         this.opts = opts;
         this.backlog = new backlogjs.Backlog({
@@ -126804,14 +126808,6 @@ class Backlog {
         if (foundPriority === undefined)
             throw new Error(`priority not found: ${this.opts.priorityIdOrName}`);
         this.priority = foundPriority;
-    }
-    /**
-     * Backlog課題作成。作成後、Backlog課題キーを返すニャ。
-     */
-    async issueCreate(githubIssue) {
-        if (!this.issueType || !this.priority) {
-            throw new Error("issueType or priority not found");
-        }
         const initialStatus = await fromPromise(this.backlog.getProjectStatuses(this.projectId), (e) => e);
         if (initialStatus.isErr()) {
             console.debug(initialStatus.error, {
@@ -126820,11 +126816,32 @@ class Backlog {
             });
             throw new Error(`getProjectStatuses failed: ${this.opts.initialStatusIdOrName}`);
         }
-        console.log(initialStatus);
         const foundInitialStatus = initialStatus.value.find((s) => s.name === this.opts.initialStatusIdOrName ||
             s.id === Number(this.opts.initialStatusIdOrName));
         if (foundInitialStatus === undefined)
             throw new Error(`initialStatus not found: ${this.opts.initialStatusIdOrName}`);
+        const completedStatus = await fromPromise(this.backlog.getProjectStatuses(this.projectId), (e) => e);
+        if (completedStatus.isErr()) {
+            console.debug(completedStatus.error, {
+                projectId: this.projectId,
+                completedStatusIdOrName: this.opts.completedStatusIdOrName,
+            });
+            throw new Error(`getProjectStatuses failed: ${this.opts.completedStatusIdOrName}`);
+        }
+        const foundCompletedStatus = completedStatus.value.find((s) => s.name === this.opts.completedStatusIdOrName ||
+            s.id === Number(this.opts.completedStatusIdOrName));
+        if (foundCompletedStatus === undefined)
+            throw new Error(`completedStatus not found: ${this.opts.completedStatusIdOrName}`);
+        this.initialStatus = foundInitialStatus;
+        this.completedStatus = foundCompletedStatus;
+    }
+    /**
+     * Backlog課題作成。作成後、Backlog課題キーを返すニャ。
+     */
+    async issueCreate(githubIssue) {
+        if (!this.issueType || !this.priority) {
+            throw new Error("issueType or priority not found");
+        }
         const githubTag = Backlog.makeGithubTag(githubIssue.number.toString(), githubIssue.html_url);
         const payload = {
             projectId: this.projectId,
@@ -126842,10 +126859,17 @@ class Backlog {
         return tag;
     }
     async issueUpdate(githubIssue) {
-        const key = Backlog.extractBacklogTag(githubIssue.body);
+        if (!this.initialStatus) {
+            throw new Error("initialStatus not found");
+        }
+        const key = Backlog.extractBacklogTag(githubIssue.body || "");
+        if (key === null)
+            return;
+        const replaced = githubIssue.body?.replaceAll(Backlog.backlogRegex, "");
         const payload = {
             summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
-            description: `${Backlog.makeGithubTag(githubIssue.number.toString(), githubIssue.html_url)}\n\n${githubIssue.body || ""}`,
+            description: replaced || "",
+            statusId: this.initialStatus.id,
         };
         const updated = await fromPromise(this.backlog.patchIssue(key, payload), (e) => e);
         if (updated.isErr()) {
@@ -126854,20 +126878,14 @@ class Backlog {
         }
     }
     async issueClose(githubIssue) {
-        const key = Backlog.extractBacklogTag(githubIssue.body);
-        const completedStatus = await fromPromise(this.backlog.getProjectStatuses(this.projectId), (e) => e);
-        if (completedStatus.isErr()) {
-            console.debug(completedStatus.error, completedStatus.error.body);
-            throw new Error(`getProjectStatuses failed: ${this.opts.completedStatusIdOrName}`);
+        if (!this.completedStatus) {
+            throw new Error("completedStatus not found");
         }
-        const foundCompletedStatus = completedStatus.value.find((s) => s.name === this.opts.completedStatusIdOrName ||
-            s.id === Number(this.opts.completedStatusIdOrName));
-        if (foundCompletedStatus === undefined) {
-            console.debug(foundCompletedStatus);
-            throw new Error(`completedStatus not found: ${this.opts.completedStatusIdOrName}`);
-        }
+        const key = Backlog.extractBacklogTag(githubIssue.body || "");
+        if (key === null)
+            return;
         const payload = {
-            statusId: foundCompletedStatus.id,
+            statusId: this.completedStatus.id,
         };
         const updated = await fromPromise(this.backlog.patchIssue(key, payload), (e) => e);
         if (updated.isErr()) {
@@ -126878,23 +126896,16 @@ class Backlog {
     /**
      * GitHub issue本文から `backlog #KEY` を抽出するニャ。
      */
-    static extractBacklogTag(body) {
-        if (!body) {
-            throw new Error("body is required");
-        }
-        const regex = /backlog\s+\[#([A-Z0-9\-_]+)\]/i;
-        const match = body.match(regex);
-        if (!match) {
-            throw new Error("backlog tag not found");
-        }
-        return match[1];
+    static extractBacklogTag(text) {
+        const match = text.match(Backlog.backlogRegex);
+        return match ? match[1] : null;
     }
     /**
      * backlog #KEY 文字列をMarkdownリンクで生成するニャ。
      */
     static makeBacklogTag(key, host) {
-        const url = `${host.replace(/\/$/, "")}/view/${key}`;
-        return `backlog [#${key}](https://${url})`;
+        const url = `https://${host}/view/${key}`;
+        return `backlog [#${key}](${url})`;
     }
     static makeGithubTag(key, url) {
         return `github [#${key}](${url})`;
@@ -126941,15 +126952,15 @@ async function handleOpen({ issue, repo, }) {
     const octokit = githubExports.getOctokit(token);
     const backlog = new Backlog(opts);
     await backlog.init();
-    const tag = await backlog.issueCreate(issue);
-    const newBody = `${issue.body || ""}\n\n${tag}`;
+    const backlogTag = await backlog.issueCreate(issue);
+    const newBody = `${backlogTag}\n\n${issue.body || ""}`;
     await octokit.rest.issues.update({
         owner: repo.owner,
         repo: repo.repo,
         issue_number: issue.number,
         body: newBody,
     });
-    coreExports.info(`Backlog課題を新規作成し、リンクを追記したニャ: ${tag}`);
+    coreExports.info(`Backlog課題を新規作成し、リンクを追記したニャ: ${backlogTag}`);
 }
 
 async function handleReopen({ issue }) {
@@ -126981,7 +126992,6 @@ async function run() {
             coreExports.setFailed(error.message);
     }
 }
-/* istanbul ignore next */
 run();
 
 export { run };
