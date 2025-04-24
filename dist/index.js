@@ -126826,7 +126826,7 @@ class Backlog {
             description: `${githubTag}\n\n${githubIssue.body || ""}`,
         }), (e) => e);
         if (created.isErr()) {
-            console.debug(created.error, created.error.body);
+            console.debug(created.error, await created.error.response.json());
             throw new Error(`postIssue failed: ${githubIssue.title}`);
         }
         const tag = Backlog.makeBacklogTag(created.value.issueKey, this.opts.host);

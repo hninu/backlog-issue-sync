@@ -1,5 +1,8 @@
 import backlogjs from "backlog-js";
-import type { BacklogError } from "backlog-js/dist/types/error.js";
+import type {
+	BacklogApiError,
+	BacklogError,
+} from "backlog-js/dist/types/error.js";
 import { fromPromise } from "neverthrow";
 import type { BacklogOptions, GithubIssue } from "../../type.js";
 
@@ -108,11 +111,11 @@ export class Backlog {
 				statusId: foundInitialStatus.id,
 				description: `${githubTag}\n\n${githubIssue.body || ""}`,
 			}),
-			(e) => e as BacklogError,
+			(e) => e as BacklogApiError,
 		);
 
 		if (created.isErr()) {
-			console.debug(created.error, created.error.body);
+			console.debug(created.error, await created.error.response.json());
 			throw new Error(`postIssue failed: ${githubIssue.title}`);
 		}
 
