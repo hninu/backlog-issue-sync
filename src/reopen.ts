@@ -1,11 +1,12 @@
-import { Backlog } from "./core/backlog/index.js";
+import { BacklogIssueService } from "./core/backlog/index.js";
+import { BacklogApiClient } from "./core/backlog/index.js";
 import type { GithubIssue } from "./type.js";
 import { getBacklogOptions } from "./utils/index.js";
 
 export async function handleReopen({ issue }: { issue: GithubIssue }) {
 	const opts = getBacklogOptions();
-
-	const backlog = new Backlog(opts);
-	await backlog.init();
-	return await backlog.issueUpdate(issue);
+	const api = new BacklogApiClient(opts);
+	const service = new BacklogIssueService(api, opts);
+	await service.init();
+	return await service.updateIssue(issue);
 }

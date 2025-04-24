@@ -28,8 +28,8 @@
 		"local-action": "pnpx @github/local-action . src/main.ts .env",
 		"package": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
 		"package:watch": "pnpm run package -- --watch",
-		"test": "vitest --watch false",
-		"all": "pnpm run check && pnpm run test && pnpm run coverage && pnpm run package"
+		"test": "vitest",
+		"all": "pnpm run check && CI=true pnpm run test && pnpm run coverage && pnpm run package"
 	},
 	"license": "MIT",
 	"dependencies": {

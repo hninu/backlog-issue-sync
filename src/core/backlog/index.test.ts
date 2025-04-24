@@ -1,188 +1,220 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import * as fixtures from "./backlog.fixtures.js";
+import { BacklogApiClient } from "./backlogApiClient.js";
+import { BacklogIssueService } from "./backlogIssueService.js";
+import * as backlogUtils from "./backlogUtils.js";
 
-const BacklogMock = vi
-	.fn<() => typeof fixtures>()
-	.mockImplementation(() => fixtures);
+// Configuration options for Backlog API client
+const opts = {
+	host: "example.backlog.com",
+	apiKey: "dummy",
+	projectIdOrKey: "TEST",
+	summaryPrefix: "[prefix]",
+	issueTypeIdOrName: "Bug",
+	priorityIdOrName: "High",
+	initialStatusIdOrName: "Open",
+	completedStatusIdOrName: "Closed",
+};
 
-// Prepare mocks for backlog-js
-vi.mock("backlog-js", () => {
-	return {
-		default: {
-			Backlog: BacklogMock,
-		},
-	};
-});
+// Sample GitHub issue data
+const githubIssue = {
+	id: 123,
+	number: 1,
+	title: "Test Issue",
+	body: "body text",
+	html_url: "https://github.com/org/repo/issues/1",
+	state: "open",
+	state_reason: null,
+	user: { login: "test-user", id: 42 },
+} as const;
 
-const { Backlog } = await import("./index.js");
-
-describe("Backlog.backlogRegex", () => {
+// Test suite for Backlog/GitHub tag utility functions
+describe("backlogUtils", () => {
+	// Test extracting key from text surrounded by other text
 	it("extracts key when surrounded by text", () => {
 		const text = "foo backlog [#ABC-123](https://host/view/ABC-123) bar";
-		expect(Backlog.extractBacklogTag(text)).toBe("ABC-123");
+		expect(backlogUtils.extractBacklogTag(text)).toBe("ABC-123");
 	});
+
+	// Test case insensitivity of extraction
 	it("is case insensitive", () => {
 		const text = "BaCkLoG [#XYZ](https://host/view/XYZ)";
-		expect(Backlog.extractBacklogTag(text)).toBe("XYZ");
+		expect(backlogUtils.extractBacklogTag(text)).toBe("XYZ");
 	});
+
+	// Test returning null when no backlog tag is present
 	it("returns null when no backlog tag present", () => {
 		const text = "no backlog here";
-		expect(Backlog.extractBacklogTag(text)).toBeNull();
+		expect(backlogUtils.extractBacklogTag(text)).toBeNull();
 	});
-});
 
-describe("makeBacklogTag", () => {
+	// Test creating a proper markdown link
 	it("creates proper markdown link", () => {
-		const tag = Backlog.makeBacklogTag("KEY", "wmnbdev.backlog.com");
+		const tag = backlogUtils.makeBacklogTag("KEY", "wmnbdev.backlog.com");
 		expect(tag).toBe("backlog [#KEY](https://wmnbdev.backlog.com/view/KEY)");
 	});
 });
 
-describe("Backlog class (with mocked backlog-js)", () => {
+// Test suite for BacklogIssueService with mocked API
+describe("BacklogIssueService (with mocked api)", () => {
+	let api: BacklogApiClient;
+	let service: BacklogIssueService;
+
+	// Set up mocked API and service before each test
 	beforeEach(() => {
-		BacklogMock.mockClear().mockImplementation(() => fixtures);
+		api = new BacklogApiClient(opts);
+		service = new BacklogIssueService(api, opts);
+
+		// Mock API responses
+		api.getProject = vi.fn().mockResolvedValue({
+			isOk: () => true,
+			isErr: () => false,
+			value: { id: 1 },
+		});
+		api.getIssueTypes = vi.fn().mockResolvedValue({
+			isOk: () => true,
+			isErr: () => false,
+			value: [{ id: 2, name: "Bug" }],
+		});
+		api.getPriorities = vi.fn().mockResolvedValue({
+			isOk: () => true,
+			isErr: () => false,
+			value: [{ id: 3, name: "High" }],
+		});
+		api.getProjectStatuses = vi.fn().mockResolvedValue({
+			isOk: () => true,
+			isErr: () => false,
+			value: [
+				{ id: 4, name: "Open" },
+				{ id: 5, name: "Closed" },
+			],
+		});
+		api.postIssue = vi.fn().mockResolvedValue({
+			isOk: () => true,
+			isErr: () => false,
+			value: { issueKey: "ABC-123" },
+		});
+		api.patchIssue = vi.fn().mockResolvedValue({
+			isOk: () => true,
+			isErr: () => false,
+			value: { issueKey: "ABC-123" },
+		});
 	});
 
-	// Add all required properties for BacklogOptions
-	const opts = {
-		host: "example.backlog.com",
-		apiKey: "dummy",
-		projectIdOrKey: "TEST",
-		summaryPrefix: "[prefix]",
-		issueTypeIdOrName: "Bug",
-		priorityIdOrName: "High",
-		initialStatusIdOrName: "Open",
-		completedStatusIdOrName: "Closed",
-	};
-
-	// Add all required properties for GithubIssue
-	const githubIssue = {
-		id: 123,
-		number: 1,
-		title: "Test Issue",
-		body: "body text",
-		html_url: "https://github.com/org/repo/issues/1",
-		state: "open",
-		state_reason: null,
-		user: { login: "test-user", id: 42 },
-	} as const;
-
+	// Test creating a backlog issue and returning the tag
 	it("should create a backlog issue and return tag", async () => {
-		const backlog = new Backlog(opts);
-		await backlog.init();
-		const tag = await backlog.issueCreate(githubIssue);
-		expect(tag).toBe(
-			"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
-		);
+		await service.init();
+		const result = await service.createIssue(githubIssue);
+		if (result.isOk()) {
+			expect(result.value).toBe(
+				"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
+			);
+		}
 	});
 
+	// Test updating a backlog issue and returning the tag
 	it("should update a backlog issue and return tag", async () => {
-		const backlog = new Backlog(opts);
-		await backlog.init();
+		await service.init();
 		const issue = {
 			...githubIssue,
 			body: "backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
 		};
-		const tag = await backlog.issueUpdate(issue);
-		expect(tag).toBe(
-			"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
-		);
+		const result = await service.updateIssue(issue);
+		if (result.isOk()) {
+			expect(result.value).toBe(
+				"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
+			);
+		}
 	});
 
+	// Test closing a backlog issue and returning the tag
 	it("should close a backlog issue and return tag", async () => {
-		const backlog = new Backlog(opts);
-		await backlog.init();
+		await service.init();
 		const issue = {
 			...githubIssue,
 			body: "backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
 		};
-		const tag = await backlog.issueClose(issue);
-		expect(tag).toBe(
-			"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
-		);
-	});
-});
-
-describe("Backlog error cases (with mocked backlog-js)", () => {
-	beforeEach(() => {
-		BacklogMock.mockClear().mockImplementation(() => fixtures);
+		const result = await service.closeIssue(issue);
+		if (result.isOk()) {
+			expect(result.value).toBe(
+				"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
+			);
+		}
 	});
 
-	const opts = {
-		host: "example.backlog.com",
-		apiKey: "dummy",
-		projectIdOrKey: "TEST",
-		summaryPrefix: "[prefix]",
-		issueTypeIdOrName: "Bug",
-		priorityIdOrName: "High",
-		initialStatusIdOrName: "Open",
-		completedStatusIdOrName: "Closed",
-	};
-
-	const githubIssue = {
-		id: 123,
-		number: 1,
-		title: "Test Issue",
-		body: "body text",
-		html_url: "https://github.com/org/repo/issues/1",
-		state: "open",
-		state_reason: null,
-		user: { login: "test-user", id: 42 },
-	} as const;
-
-	it("should throw if getProject fails in init", async () => {
-		BacklogMock.mockImplementation(() => ({
-			...fixtures,
-			getProject: vi.fn().mockRejectedValue(new Error("getProject failed")),
-		}));
-		const { Backlog } = await import("./index.js");
-		const backlog = new Backlog(opts);
-		await expect(backlog.init()).rejects.toThrow("getProject failed");
+	// Test returning undefined if no backlog tag is present in updateIssue
+	it("should return undefined if no backlog tag in updateIssue", async () => {
+		await service.init();
+		const result = await service.updateIssue({
+			...githubIssue,
+			body: "no tag here",
+		});
+		if (result.isOk()) {
+			expect(result.value).toBeUndefined();
+		}
 	});
 
-	it("should throw if postIssue fails in issueCreate", async () => {
-		fixtures.postIssue
-			.mockClear()
-			.mockRejectedValue(new Error("postIssue failed"));
-		const { Backlog } = await import("./index.js");
-		const backlog = new Backlog(opts);
-		await backlog.init();
-		await expect(backlog.issueCreate(githubIssue)).rejects.toThrow(
-			"postIssue failed",
-		);
+	// Test returning undefined if no backlog tag is present in closeIssue
+	it("should return undefined if no backlog tag in closeIssue", async () => {
+		await service.init();
+		const result = await service.closeIssue({
+			...githubIssue,
+			body: "no tag here",
+		});
+
+		if (result.isOk()) {
+			expect(result.value).toBeUndefined();
+		}
 	});
 
-	it("should throw if patchIssue fails in issueUpdate", async () => {
-		fixtures.patchIssue
-			.mockClear()
-			.mockRejectedValue(new Error("patchIssue failed"));
-		const { Backlog } = await import("./index.js");
-		const backlog = new Backlog(opts);
-		await backlog.init();
+	// Test error handling when getProject fails in init
+	it("should error if getProject fails in init", async () => {
+		api.getProject = vi.fn().mockResolvedValue({
+			isOk: () => false,
+			isErr: () => true,
+			error: new Error("getProject failed"),
+		});
+
+		const result = await service.init();
+
+		if (result.isErr()) {
+			expect(result.error.message).toMatch("Failed to get project");
+		}
+	});
+
+	// Test error handling when postIssue fails in createIssue
+	it("should error if postIssue fails in createIssue", async () => {
+		await service.init();
+
+		api.postIssue = vi.fn().mockResolvedValue({
+			isOk: () => false,
+			isErr: () => true,
+			error: new Error("postIssue failed"),
+		});
+
+		const result = await service.createIssue(githubIssue);
+
+		if (result.isErr()) {
+			expect(result.error.message).toMatch("Failed to create issue");
+		}
+	});
+
+	// Test error handling when patchIssue fails in updateIssue
+	it("should error if patchIssue fails in updateIssue", async () => {
+		await service.init();
+		api.patchIssue = vi.fn().mockResolvedValue({
+			isOk: () => false,
+			isErr: () => true,
+			error: new Error("patchIssue failed"),
+		});
+
 		const issue = {
 			...githubIssue,
 			body: "backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
 		};
-		await expect(backlog.issueUpdate(issue)).rejects.toThrow(
-			"patchIssue failed",
-		);
-	});
+		const result = await service.updateIssue(issue);
 
-	it("should return undefined if no backlog tag in issueUpdate", async () => {
-		const { Backlog } = await import("./index.js");
-		const backlog = new Backlog(opts);
-		await backlog.init();
-		const issue = { ...githubIssue, body: "no tag here" };
-		const result = await backlog.issueUpdate(issue);
-		expect(result).toBeUndefined();
-	});
-
-	it("should return undefined if no backlog tag in issueClose", async () => {
-		const { Backlog } = await import("./index.js");
-		const backlog = new Backlog(opts);
-		await backlog.init();
-		const issue = { ...githubIssue, body: "no tag here" };
-		const result = await backlog.issueClose(issue);
-		expect(result).toBeUndefined();
+		if (result.isErr()) {
+			expect(result.error.message).toMatch("Failed to update issue");
+		}
 	});
 });

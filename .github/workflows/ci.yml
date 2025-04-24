@@ -31,9 +31,3 @@ jobs:
       - name: Check
         id: pnpm-check
         run: pnpm run check
-
-      # - name: Test
-      #   id: pnpm-ci-test
-      #   run: pnpm run ci-test
-
-

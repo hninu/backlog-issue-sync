@@ -1,5 +1,6 @@
 import * as github from "@actions/github";
-import { Backlog } from "./core/backlog/index.js";
+import { BacklogIssueService } from "./core/backlog/index.js";
+import { BacklogApiClient } from "./core/backlog/index.js";
 import type { GithubIssue } from "./type.js";
 import { getBacklogOptions, getGithubToken } from "./utils/index.js";
 
@@ -15,9 +16,10 @@ export async function handleOpen({
 
 	const octokit = github.getOctokit(token);
 
-	const backlog = new Backlog(opts);
-	await backlog.init();
-	const backlogTag = await backlog.issueCreate(issue);
+	const api = new BacklogApiClient(opts);
+	const service = new BacklogIssueService(api, opts);
+	await service.init();
+	const backlogTag = await service.createIssue(issue);
 
 	const newBody = `${backlogTag}\n\n${issue.body || ""}`;
 	await octokit.rest.issues.update({

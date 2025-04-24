@@ -5,7 +5,7 @@ import * as core from "@actions/core";
 import * as github from "@actions/github";
 
 import { handleClosed } from "./closed.js";
-import { Backlog } from "./core/backlog/index.js";
+import { extractBacklogTag } from "./core/backlog/backlogUtils.js";
 import { handleEdit } from "./edit.js";
 import { handleOpen } from "./open.js";
 import { handleReopen } from "./reopen.js";
@@ -24,7 +24,7 @@ export async function run(): Promise<void> {
 		}
 
 		if (issue.state === "open") {
-			const existBacklogTag = Backlog.extractBacklogTag(issue.body || "");
+			const existBacklogTag = extractBacklogTag(issue.body || "");
 
 			if (existBacklogTag === null) {
 				const tag = await handleOpen({ issue, repo });
