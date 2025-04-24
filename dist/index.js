@@ -126865,7 +126865,7 @@ class Backlog {
         const key = Backlog.extractBacklogTag(githubIssue.body || "");
         if (key === null)
             return;
-        const replaced = githubIssue.body?.replaceAll(Backlog.backlogRegex, "");
+        const replaced = githubIssue.body?.replace(Backlog.backlogRegex, "");
         const payload = {
             summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
             description: replaced || "",
