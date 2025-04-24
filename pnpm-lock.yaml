@@ -9,59 +9,59 @@ importers:
   .:
     dependencies:
       '@actions/core':
-        specifier: ^1.11.1
+        specifier: 1.11.1
         version: 1.11.1
       '@actions/github':
-        specifier: ^6.0.0
+        specifier: 6.0.0
         version: 6.0.0
       backlog-js:
-        specifier: ^0.13.3
+        specifier: 0.13.3
         version: 0.13.3
       isomorphic-fetch:
-        specifier: ^3.0.0
+        specifier: 3.0.0
         version: 3.0.0
       isomorphic-form-data:
-        specifier: ^2.0.0
+        specifier: 2.0.0
         version: 2.0.0
       neverthrow:
-        specifier: ^8.2.0
+        specifier: 8.2.0
         version: 8.2.0
     devDependencies:
       '@biomejs/biome':
         specifier: 1.9.4
         version: 1.9.4
       '@github/local-action':
-        specifier: ^3.2.0
-        version: 3.2.0
+        specifier: 3.1.4
+        version: 3.1.4
       '@rollup/plugin-commonjs':
-        specifier: ^28.0.3
-        version: 28.0.3(rollup@4.40.0)
+        specifier: 28.0.1
+        version: 28.0.1(rollup@4.40.0)
       '@rollup/plugin-json':
-        specifier: ^6.1.0
+        specifier: 6.1.0
         version: 6.1.0(rollup@4.40.0)
       '@rollup/plugin-node-resolve':
-        specifier: ^16.0.1
+        specifier: 16.0.1
         version: 16.0.1(rollup@4.40.0)
       '@rollup/plugin-typescript':
-        specifier: ^12.1.2
-        version: 12.1.2(rollup@4.40.0)(tslib@2.8.1)(typescript@5.8.3)
+        specifier: 12.1.1
+        version: 12.1.1(rollup@4.40.0)(tslib@2.8.1)(typescript@5.8.3)
       '@types/node':
-        specifier: ^20.17.30
+        specifier: 20.17.30
         version: 20.17.30
       lefthook:
         specifier: 1.11.11
         version: 1.11.11
       make-coverage-badge:
-        specifier: ^1.2.0
+        specifier: 1.2.0
         version: 1.2.0
       rollup:
-        specifier: ^4.40.0
+        specifier: 4.40.0
         version: 4.40.0
       typescript:
-        specifier: ^5.8.3
+        specifier: 5.8.3
         version: 5.8.3
       vitest:
-        specifier: ^3.1.2
+        specifier: 3.1.2
         version: 3.1.2(@types/node@20.17.30)(tsx@4.19.3)(yaml@2.7.1)
     optionalDependencies:
       '@rollup/rollup-linux-x64-gnu':
@@ -342,21 +342,12 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@eslint/compat@1.2.8':
-    resolution: {integrity: sha512-LqCYHdWL/QqKIJuZ/ucMAv8d4luKGs4oCPgpt8mWztQAtPrHfXKQ/XAUc8ljCHAfJCn6SvkpTcGt5Tsh8saowA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      eslint: ^9.10.0
-    peerDependenciesMeta:
-      eslint:
-        optional: true
-
   '@fastify/busboy@2.1.1':
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@github/local-action@3.2.0':
-    resolution: {integrity: sha512-BkOYsAY1cKHdM39JJKDvGNcOptLvxAADPfgWebztGrxwejssi+/PA4UTIHem+sX+6gWkaqIhSFEIVGLm0/z7NQ==}
+  '@github/local-action@3.1.4':
+    resolution: {integrity: sha512-PwA4w5jsjbyK+DNFNnFc4htu0iBOngi8g+O7NV8eGo9wm5YpIxf9kKgLJgVDIZlT32rfOVre5XZzGdPLTfggHQ==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -429,12 +420,6 @@ packages:
     peerDependencies:
       '@octokit/core': '>=6'
 
-  '@octokit/plugin-paginate-rest@12.0.0':
-    resolution: {integrity: sha512-MPd6WK1VtZ52lFrgZ0R2FlaoiWllzgqFHaSZxvp72NmoDeZ0m8GeJdg4oB6ctqMTYyrnDYp592Xma21mrgiyDA==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      '@octokit/core': '>=6'
-
   '@octokit/plugin-paginate-rest@2.21.3':
     resolution: {integrity: sha512-aCZTEf0y2h3OLbrgKkrfFdjRL6eSOo8komneVQJnYecAxIej7Bafor2xhuDJOIFau4pk0i/P28/XgtbyPF0ZHw==}
     peerDependencies:
@@ -465,12 +450,6 @@ packages:
 
   '@octokit/plugin-rest-endpoint-methods@13.5.0':
     resolution: {integrity: sha512-9Pas60Iv9ejO3WlAX3maE1+38c5nqbJXV5GrncEfkndIpZrJ/WPMRd2xYDcPPEt5yzpxcjw9fWNoPhsSGzqKqw==}
-    engines: {node: '>= 18'}
-    peerDependencies:
-      '@octokit/core': '>=6'
-
-  '@octokit/plugin-rest-endpoint-methods@14.0.0':
-    resolution: {integrity: sha512-iQt6ovem4b7zZYZQtdv+PwgbL5VPq37th1m2x2TdkgimIDJpsi2A6Q/OI/23i/hR6z5mL0EgisNR4dcbmckSZQ==}
     engines: {node: '>= 18'}
     peerDependencies:
       '@octokit/core': '>=6'
@@ -548,8 +527,8 @@ packages:
   '@protobuf-ts/runtime@2.9.6':
     resolution: {integrity: sha512-C0CfpKx4n4LBbUrajOdRj2BTbd3qBoK0SiKWLq7RgCoU6xiN4wesBMFHUOBp3fFzKeZwgU8Q2KtzaqzIvPLRXg==}
 
-  '@rollup/plugin-commonjs@28.0.3':
-    resolution: {integrity: sha512-pyltgilam1QPdn+Zd9gaCfOLcnjMEJ9gV+bTw6/r73INdvzf1ah9zLIJBm+kW7R6IUFIQ1YO+VqZtYxZNWFPEQ==}
+  '@rollup/plugin-commonjs@28.0.1':
+    resolution: {integrity: sha512-+tNWdlWKbpB3WgBN7ijjYkq9X5uhjmcvyjEght4NmH5fAU++zfQzAJ6wumLS+dNcvwEZhKx2Z+skY8m7v0wGSA==}
     engines: {node: '>=16.0.0 || 14 >= 14.17'}
     peerDependencies:
       rollup: ^2.68.0||^3.0.0||^4.0.0
@@ -575,8 +554,8 @@ packages:
       rollup:
         optional: true
 
-  '@rollup/plugin-typescript@12.1.2':
-    resolution: {integrity: sha512-cdtSp154H5sv637uMr1a8OTWB0L1SWDSm1rDGiyfcGcvQ6cuTs4MDk2BVEBGysUWago4OJN4EQZqOTl/QY3Jgg==}
+  '@rollup/plugin-typescript@12.1.1':
+    resolution: {integrity: sha512-t7O653DpfB5MbFrqPe/VcKFFkvRuFNp9qId3xq4Eth5xlyymzxNpye2z8Hrl0RIMuXTSr5GGcFpkdlMeacUiFQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^2.14.0||^3.0.0||^4.0.0
@@ -1860,22 +1839,19 @@ snapshots:
   '@esbuild/win32-x64@0.25.3':
     optional: true
 
-  '@eslint/compat@1.2.8': {}
-
   '@fastify/busboy@2.1.1': {}
 
-  '@github/local-action@3.2.0':
+  '@github/local-action@3.1.4':
     dependencies:
       '@actions/artifact': 2.3.2
       '@actions/core': 1.11.1
       '@actions/exec': 1.1.1
       '@actions/github': 6.0.0
       '@actions/http-client': 2.2.3
-      '@eslint/compat': 1.2.8
       '@octokit/core': 6.1.5
-      '@octokit/plugin-paginate-rest': 12.0.0(@octokit/core@6.1.5)
+      '@octokit/plugin-paginate-rest': 11.6.0(@octokit/core@6.1.5)
       '@octokit/plugin-request-log': 5.3.1(@octokit/core@6.1.5)
-      '@octokit/plugin-rest-endpoint-methods': 14.0.0(@octokit/core@6.1.5)
+      '@octokit/plugin-rest-endpoint-methods': 13.5.0(@octokit/core@6.1.5)
       '@octokit/plugin-retry': 7.2.1(@octokit/core@6.1.5)
       '@octokit/rest': 21.1.1
       archiver: 7.0.1
@@ -1893,7 +1869,6 @@ snapshots:
       yaml: 2.7.1
     transitivePeerDependencies:
       - encoding
-      - eslint
       - supports-color
 
   '@isaacs/cliui@8.0.2':
@@ -1996,11 +1971,6 @@ snapshots:
       '@octokit/core': 6.1.5
       '@octokit/types': 13.10.0
 
-  '@octokit/plugin-paginate-rest@12.0.0(@octokit/core@6.1.5)':
-    dependencies:
-      '@octokit/core': 6.1.5
-      '@octokit/types': 14.0.0
-
   '@octokit/plugin-paginate-rest@2.21.3(@octokit/core@3.6.0)':
     dependencies:
       '@octokit/core': 3.6.0
@@ -2028,11 +1998,6 @@ snapshots:
     dependencies:
       '@octokit/core': 6.1.5
       '@octokit/types': 13.10.0
-
-  '@octokit/plugin-rest-endpoint-methods@14.0.0(@octokit/core@6.1.5)':
-    dependencies:
-      '@octokit/core': 6.1.5
-      '@octokit/types': 14.0.0
 
   '@octokit/plugin-rest-endpoint-methods@5.16.2(@octokit/core@3.6.0)':
     dependencies:
@@ -2141,7 +2106,7 @@ snapshots:
 
   '@protobuf-ts/runtime@2.9.6': {}
 
-  '@rollup/plugin-commonjs@28.0.3(rollup@4.40.0)':
+  '@rollup/plugin-commonjs@28.0.1(rollup@4.40.0)':
     dependencies:
       '@rollup/pluginutils': 5.1.4(rollup@4.40.0)
       commondir: 1.0.1
@@ -2169,7 +2134,7 @@ snapshots:
     optionalDependencies:
       rollup: 4.40.0
 
-  '@rollup/plugin-typescript@12.1.2(rollup@4.40.0)(tslib@2.8.1)(typescript@5.8.3)':
+  '@rollup/plugin-typescript@12.1.1(rollup@4.40.0)(tslib@2.8.1)(typescript@5.8.3)':
     dependencies:
       '@rollup/pluginutils': 5.1.4(rollup@4.40.0)
       resolve: 1.22.10

@@ -33,29 +33,29 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"@actions/core": "^1.11.1",
-		"@actions/github": "^6.0.0",
-		"backlog-js": "^0.13.3",
-		"isomorphic-fetch": "^3.0.0",
-		"isomorphic-form-data": "^2.0.0",
-		"neverthrow": "^8.2.0"
+		"@actions/core": "1.11.1",
+		"@actions/github": "6.0.0",
+		"backlog-js": "0.13.3",
+		"isomorphic-fetch": "3.0.0",
+		"isomorphic-form-data": "2.0.0",
+		"neverthrow": "8.2.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"@github/local-action": "^3.1.4",
-		"@rollup/plugin-commonjs": "^28.0.1",
-		"@rollup/plugin-json": "^6.1.0",
-		"@rollup/plugin-node-resolve": "^16.0.1",
-		"@rollup/plugin-typescript": "^12.1.1",
-		"@types/node": "^20.17.30",
+		"@github/local-action": "3.1.4",
+		"@rollup/plugin-commonjs": "28.0.1",
+		"@rollup/plugin-json": "6.1.0",
+		"@rollup/plugin-node-resolve": "16.0.1",
+		"@rollup/plugin-typescript": "12.1.1",
+		"@types/node": "20.17.30",
 		"lefthook": "1.11.11",
-		"make-coverage-badge": "^1.2.0",
-		"rollup": "^4.40.0",
-		"typescript": "^5.8.3",
-		"vitest": "^3.1.2"
+		"make-coverage-badge": "1.2.0",
+		"rollup": "4.40.0",
+		"typescript": "5.8.3",
+		"vitest": "3.1.2"
 	},
 	"optionalDependencies": {
-		"@rollup/rollup-linux-x64-gnu": "*"
+		"@rollup/rollup-linux-x64-gnu": "^4.40.0"
 	},
 	"packageManager": "pnpm@10.9.0+sha512.0486e394640d3c1fb3c9d43d49cf92879ff74f8516959c235308f5a8f62e2e19528a65cdc2a3058f587cde71eba3d5b56327c8c33a97e4c4051ca48a10ca2d5f"
 }

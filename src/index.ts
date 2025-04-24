@@ -14,9 +14,7 @@ import type { GithubIssue } from "./type.js";
 export async function run(): Promise<void> {
 	try {
 		const { payload, repo } = github.context;
-
 		const issue = payload.issue as GithubIssue;
-		console.info("issue: ", issue);
 
 		if (issue.state === "open" && issue.state_reason === "reopened") {
 			const tag = await handleReopen({ issue });
