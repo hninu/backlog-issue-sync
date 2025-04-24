@@ -34,5 +34,4 @@ export async function run(): Promise<void> {
 	}
 }
 
-/* istanbul ignore next */
 run();

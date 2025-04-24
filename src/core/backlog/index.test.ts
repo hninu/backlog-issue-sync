@@ -12,7 +12,7 @@ import { Backlog } from "./index.js";
 it("test", async () => {
 	// const backlog = new Backlog({
 	// 	host: "wmnbdev.backlog.com",
-	// 	apiKey: "viMppo5daIlWfrg9DsBGpDz39PEGbYpf2nejdIiMPTjTyqW0rDtn6oXQ4LSvJsdD",
+	// 	apiKey: "xxx",
 	// 	projectIdOrKey: "MFREBIRTH",
 	// 	issueTypeIdOrName: "課題",
 	// 	priorityIdOrName: "中",
@@ -21,12 +21,10 @@ it("test", async () => {
 	// });
 
 	// await backlog.init();
+	const text =
+		"aaabacklog [#MFREBIRTH-750](https://wmnbdev.backlog.com/view/MFREBIRTH-750)bbb";
 
-	const tag = Backlog.extractBacklogTag(`
-あ
+	const extracted = Backlog.extractBacklogTag(text);
 
-backlog [#MFREBIRTH-750](https://wmnbdev.backlog.com/view/MFREBIRTH-750)
-`);
-
-	expect(tag).toBe("MFREBIRTH-750");
+	expect(extracted).toBe("MFREBIRTH-750");
 });
