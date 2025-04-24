@@ -1186,7 +1186,7 @@ packages:
 
   make-coverage-badge@1.2.0:
     resolution: {integrity: sha512-nA1eQZJ9vcY2UoQLVIdzqyRoNtAZHWlXJfrHkaMB/pQgTYBPmbImkykfxWeAtUQuLJXzb6eAhbR7nEgrt+S7FA==}
-    engines: {node: '>=6.11', npm: '>=5.3'}
+    engines: {node: '>=6.11', pnpm: '>=5.3'}
     hasBin: true
 
   math-intrinsics@1.1.0:
@@ -1327,7 +1327,7 @@ packages:
 
   rollup@4.40.0:
     resolution: {integrity: sha512-Noe455xmA96nnqH5piFtLobsGbCij7Tu+tb3c1vYjNbTkfzGqXqQXG3wJaYXkRZuQ0vEYN4bhwg7QnIrqB5B+w==}
-    engines: {node: '>=18.0.0', npm: '>=8.0.0'}
+    engines: {node: '>=18.0.0', pnpm: '>=8.0.0'}
     hasBin: true
 
   safe-buffer@5.1.2:
@@ -1452,7 +1452,7 @@ packages:
     engines: {node: '>=6'}
 
   tslib@2.8.1:
-    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wpnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
   tsx@4.19.3:
     resolution: {integrity: sha512-4H8vUNGNjQ4V2EOoGw005+c+dGuPSnhpPBPHBtsZdGZBk/iJb4kguGlPWaZTZ3q5nMtFOEsY0nRDlh9PJyd6SQ==}
