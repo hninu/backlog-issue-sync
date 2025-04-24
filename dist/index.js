@@ -126820,6 +126820,7 @@ class Backlog {
             });
             throw new Error(`getProjectStatuses failed: ${this.opts.initialStatusIdOrName}`);
         }
+        console.log(initialStatus);
         const foundInitialStatus = initialStatus.value.find((s) => s.name === this.opts.initialStatusIdOrName ||
             s.id === Number(this.opts.initialStatusIdOrName));
         if (foundInitialStatus === undefined)
@@ -126830,7 +126831,6 @@ class Backlog {
             issueTypeId: this.issueType.id,
             priorityId: this.priority.id,
             summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
-            statusId: foundInitialStatus.id,
             description: `${githubTag}\n\n${githubIssue.body || ""}`,
         };
         const created = await fromPromise(this.backlog.postIssue(payload), (e) => e);
