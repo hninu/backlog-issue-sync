@@ -126781,6 +126781,7 @@ class Backlog {
         this.projectId = project.id;
         const issueTypes = await fromPromise(this.backlog.getIssueTypes(this.projectId), (e) => e);
         if (issueTypes.isErr()) {
+            console.debug(issueTypes.error, issueTypes.error.body);
             throw new Error(`getIssueTypes failed: ${this.opts.issueTypeIdOrName}`);
         }
         const foundType = issueTypes.value.find((t) => t.name === this.opts.issueTypeIdOrName ||
@@ -126790,6 +126791,7 @@ class Backlog {
         this.issueType = foundType;
         const priorities = await fromPromise(this.backlog.getPriorities(), (e) => e);
         if (priorities.isErr()) {
+            console.debug(priorities.error, priorities.error.body);
             throw new Error(`getPriorities failed: ${this.opts.priorityIdOrName}`);
         }
         const foundPriority = priorities.value.find((p) => p.name === this.opts.priorityIdOrName ||
@@ -126807,6 +126809,7 @@ class Backlog {
         }
         const initialStatus = await fromPromise(this.backlog.getProjectStatuses(this.projectId), (e) => e);
         if (initialStatus.isErr()) {
+            console.debug(initialStatus.error, initialStatus.error.body);
             throw new Error(`getProjectStatuses failed: ${this.opts.initialStatusIdOrName}`);
         }
         const foundInitialStatus = initialStatus.value.find((s) => s.name === this.opts.initialStatusIdOrName ||
@@ -126814,37 +126817,52 @@ class Backlog {
         if (foundInitialStatus === undefined)
             throw new Error(`initialStatus not found: ${this.opts.initialStatusIdOrName}`);
         const githubTag = Backlog.makeGithubTag(githubIssue.number.toString(), githubIssue.html_url);
-        const created = await this.backlog.postIssue({
+        const created = await fromPromise(this.backlog.postIssue({
             projectId: this.projectId,
             issueTypeId: this.issueType.id,
             priorityId: this.priority.id,
             summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
             statusId: foundInitialStatus.id,
             description: `${githubTag}\n\n${githubIssue.body || ""}`,
-        });
-        const tag = Backlog.makeBacklogTag(created.issueKey, this.opts.host);
+        }), (e) => e);
+        if (created.isErr()) {
+            console.debug(created.error, created.error.body);
+            throw new Error(`postIssue failed: ${githubIssue.title}`);
+        }
+        const tag = Backlog.makeBacklogTag(created.value.issueKey, this.opts.host);
         return tag;
     }
     async issueUpdate(githubIssue) {
         const key = Backlog.extractBacklogTag(githubIssue.body);
-        return this.backlog.patchIssue(key, {
+        const updated = await fromPromise(this.backlog.patchIssue(key, {
             summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
             description: `${Backlog.makeGithubTag(githubIssue.number.toString(), githubIssue.html_url)}\n\n${githubIssue.body || ""}`,
-        });
+        }), (e) => e);
+        if (updated.isErr()) {
+            console.debug(updated.error, updated.error.body);
+            throw new Error(`patchIssue failed: ${githubIssue.title}`);
+        }
     }
     async issueClose(githubIssue) {
         const key = Backlog.extractBacklogTag(githubIssue.body);
         const completedStatus = await fromPromise(this.backlog.getProjectStatuses(this.projectId), (e) => e);
         if (completedStatus.isErr()) {
+            console.debug(completedStatus.error, completedStatus.error.body);
             throw new Error(`getProjectStatuses failed: ${this.opts.completedStatusIdOrName}`);
         }
         const foundCompletedStatus = completedStatus.value.find((s) => s.name === this.opts.completedStatusIdOrName ||
             s.id === Number(this.opts.completedStatusIdOrName));
-        if (foundCompletedStatus === undefined)
+        if (foundCompletedStatus === undefined) {
+            console.debug(foundCompletedStatus);
             throw new Error(`completedStatus not found: ${this.opts.completedStatusIdOrName}`);
-        return this.backlog.patchIssue(key, {
+        }
+        const updated = await fromPromise(this.backlog.patchIssue(key, {
             statusId: foundCompletedStatus.id,
-        });
+        }), (e) => e);
+        if (updated.isErr()) {
+            console.debug(updated.error, updated.error.body);
+            throw new Error(`patchIssue failed: ${githubIssue.title}`);
+        }
     }
     /**
      * GitHub issue本文から `backlog #KEY` を抽出するニャ。
@@ -126947,7 +126965,6 @@ async function run() {
         coreExports.setFailed("このアクションはissueイベントでのみ動作するニャ");
     }
     catch (error) {
-        console.debug(error);
         if (error instanceof Error)
             coreExports.setFailed(error.message);
     }

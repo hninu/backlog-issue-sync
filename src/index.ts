@@ -30,7 +30,6 @@ export async function run(): Promise<void> {
 
 		core.setFailed("このアクションはissueイベントでのみ動作するニャ");
 	} catch (error) {
-		console.debug(error);
 		if (error instanceof Error) core.setFailed(error.message);
 	}
 }

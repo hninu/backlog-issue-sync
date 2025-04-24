@@ -1,4 +1,5 @@
 import backlogjs from "backlog-js";
+import type { BacklogError } from "backlog-js/dist/types/error.js";
 import { fromPromise } from "neverthrow";
 import type { BacklogOptions, GithubIssue } from "../../type.js";
 
@@ -21,10 +22,11 @@ export class Backlog {
 
 		const issueTypes = await fromPromise(
 			this.backlog.getIssueTypes(this.projectId),
-			(e) => e as Error,
+			(e) => e as BacklogError,
 		);
 
 		if (issueTypes.isErr()) {
+			console.debug(issueTypes.error, issueTypes.error.body);
 			throw new Error(`getIssueTypes failed: ${this.opts.issueTypeIdOrName}`);
 		}
 
@@ -41,10 +43,11 @@ export class Backlog {
 
 		const priorities = await fromPromise(
 			this.backlog.getPriorities(),
-			(e) => e as Error,
+			(e) => e as BacklogError,
 		);
 
 		if (priorities.isErr()) {
+			console.debug(priorities.error, priorities.error.body);
 			throw new Error(`getPriorities failed: ${this.opts.priorityIdOrName}`);
 		}
 
@@ -70,10 +73,11 @@ export class Backlog {
 
 		const initialStatus = await fromPromise(
 			this.backlog.getProjectStatuses(this.projectId),
-			(e) => e as Error,
+			(e) => e as BacklogError,
 		);
 
 		if (initialStatus.isErr()) {
+			console.debug(initialStatus.error, initialStatus.error.body);
 			throw new Error(
 				`getProjectStatuses failed: ${this.opts.initialStatusIdOrName}`,
 			);
@@ -95,29 +99,46 @@ export class Backlog {
 			githubIssue.html_url,
 		);
 
-		const created = await this.backlog.postIssue({
-			projectId: this.projectId,
-			issueTypeId: this.issueType.id,
-			priorityId: this.priority.id,
-			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
-			statusId: foundInitialStatus.id,
-			description: `${githubTag}\n\n${githubIssue.body || ""}`,
-		});
+		const created = await fromPromise(
+			this.backlog.postIssue({
+				projectId: this.projectId,
+				issueTypeId: this.issueType.id,
+				priorityId: this.priority.id,
+				summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
+				statusId: foundInitialStatus.id,
+				description: `${githubTag}\n\n${githubIssue.body || ""}`,
+			}),
+			(e) => e as BacklogError,
+		);
 
-		const tag = Backlog.makeBacklogTag(created.issueKey, this.opts.host);
+		if (created.isErr()) {
+			console.debug(created.error, created.error.body);
+			throw new Error(`postIssue failed: ${githubIssue.title}`);
+		}
+
+		const tag = Backlog.makeBacklogTag(created.value.issueKey, this.opts.host);
 
 		return tag;
 	}
 
 	public async issueUpdate(githubIssue: GithubIssue) {
 		const key = Backlog.extractBacklogTag(githubIssue.body);
-		return this.backlog.patchIssue(key, {
-			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
-			description: `${Backlog.makeGithubTag(
-				githubIssue.number.toString(),
-				githubIssue.html_url,
-			)}\n\n${githubIssue.body || ""}`,
-		});
+
+		const updated = await fromPromise(
+			this.backlog.patchIssue(key, {
+				summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
+				description: `${Backlog.makeGithubTag(
+					githubIssue.number.toString(),
+					githubIssue.html_url,
+				)}\n\n${githubIssue.body || ""}`,
+			}),
+			(e) => e as BacklogError,
+		);
+
+		if (updated.isErr()) {
+			console.debug(updated.error, updated.error.body);
+			throw new Error(`patchIssue failed: ${githubIssue.title}`);
+		}
 	}
 
 	public async issueClose(githubIssue: GithubIssue) {
@@ -125,10 +146,11 @@ export class Backlog {
 
 		const completedStatus = await fromPromise(
 			this.backlog.getProjectStatuses(this.projectId),
-			(e) => e as Error,
+			(e) => e as BacklogError,
 		);
 
 		if (completedStatus.isErr()) {
+			console.debug(completedStatus.error, completedStatus.error.body);
 			throw new Error(
 				`getProjectStatuses failed: ${this.opts.completedStatusIdOrName}`,
 			);
@@ -140,14 +162,24 @@ export class Backlog {
 				s.id === Number(this.opts.completedStatusIdOrName),
 		);
 
-		if (foundCompletedStatus === undefined)
+		if (foundCompletedStatus === undefined) {
+			console.debug(foundCompletedStatus);
 			throw new Error(
 				`completedStatus not found: ${this.opts.completedStatusIdOrName}`,
 			);
+		}
 
-		return this.backlog.patchIssue(key, {
-			statusId: foundCompletedStatus.id,
-		});
+		const updated = await fromPromise(
+			this.backlog.patchIssue(key, {
+				statusId: foundCompletedStatus.id,
+			}),
+			(e) => e as BacklogError,
+		);
+
+		if (updated.isErr()) {
+			console.debug(updated.error, updated.error.body);
+			throw new Error(`patchIssue failed: ${githubIssue.title}`);
+		}
 	}
 
 	/**
