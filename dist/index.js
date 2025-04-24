@@ -36,7 +36,7 @@ function getDefaultExportFromCjs (x) {
 }
 
 function getAugmentedNamespace(n) {
-  if (Object.prototype.hasOwnProperty.call(n, '__esModule')) return n;
+  if (n.__esModule) return n;
   var f = n.default;
 	if (typeof f == "function") {
 		var a = function a () {
@@ -127061,7 +127061,6 @@ async function run() {
     try {
         const { payload, repo } = githubExports.context;
         const issue = payload.issue;
-        console.info("issue: ", issue);
         if (issue.state === "open" && issue.state_reason === "reopened") {
             const tag = await handleReopen({ issue });
             return coreExports.info(`Finished handling reopened issue: ${tag}`);
