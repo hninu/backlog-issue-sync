@@ -16,19 +16,6 @@ Issueの作成・編集・クローズ・再オープン時にBacklog課題も�
 - Issue編集時にBacklog課題も更新
 - Issueクローズ/再オープン時にBacklog課題も連動して状態変更
 
-## セットアップ
-
-### 前提
-
-- Node.js v20以上
-- `pnpm` 推奨
-
-### インストール
-
-```sh
-pnpm install
-```
-
 ## 使い方
 
 > **注意:**
@@ -78,6 +65,19 @@ jobs:
 | `backlog-completed-status` | ◯    | Backlog課題クローズ時に設定する完了ステータスIDまたは名前                              | なし         |
 | `backlog-summary-prefix`   | -    | Backlog課題サマリーの先頭に付与する任意のプレフィックス                                | なし         |
 | `github-token`             | ◯    | GitHubトークン（例: `${{ secrets.GITHUB_TOKEN }}`）                                    | なし         |
+
+## セットアップ
+
+### 前提
+
+- Node.js v20以上
+- `pnpm` 推奨
+
+### インストール
+
+```sh
+pnpm install
+```
 
 ## ライセンス
 

@@ -4,6 +4,8 @@
 [![Check dist/](https://github.com/hninu/backlog-issue-sync/actions/workflows/check-dist.yml/badge.svg)](https://github.com/hninu/backlog-issue-sync/actions/workflows/check-dist.yml)
 [![CodeQL](https://github.com/hninu/backlog-issue-sync/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/hninu/backlog-issue-sync/actions/workflows/codeql-analysis.yml)
 
+> 日本語README [docs/JP.md](docs/JP.md).
+
 ## Overview
 
 A GitHub Action to automatically synchronize GitHub Issues with Backlog issues.
@@ -15,19 +17,6 @@ When you create, edit, close, or reopen a GitHub Issue, the corresponding Backlo
 - Insert a Backlog issue link into the GitHub Issue body
 - Update the Backlog issue when the GitHub Issue is edited
 - Change Backlog issue status when the GitHub Issue is closed or reopened
-
-## Setup
-
-### Prerequisites
-
-- Node.js v20 or later
-- `pnpm` recommended
-
-### Installation
-
-```sh
-pnpm install
-```
 
 ## Usage
 
@@ -78,6 +67,19 @@ jobs:
 | `backlog-completed-status`| Yes      | Status ID or name for completed Backlog issues                        | None    |
 | `backlog-summary-prefix`  | -        | Optional prefix for Backlog issue summary                             | None    |
 | `github-token`            | Yes      | GitHub token (e.g. `${{ secrets.GITHUB_TOKEN }}`)                     | None    |
+
+## Setup
+
+### Prerequisites
+
+- Node.js v20 or later
+- `pnpm` recommended
+
+### Installation
+
+```sh
+pnpm install
+```
 
 ## License
 
