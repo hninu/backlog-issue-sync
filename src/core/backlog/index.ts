@@ -204,7 +204,9 @@ export class Backlog {
 		if (!body) {
 			throw new Error("body is required");
 		}
-		const match = body.match(/backlog\s+#([A-Z0-9\-_]+)/i);
+
+		const regex = /backlog\s+\[#([A-Z0-9\-_]+)\]/i;
+		const match = body.match(regex);
 
 		if (!match) {
 			throw new Error("backlog tag not found");
@@ -218,7 +220,7 @@ export class Backlog {
 	 */
 	public static makeBacklogTag(key: string, host: string): string {
 		const url = `${host.replace(/\/$/, "")}/view/${key}`;
-		return `backlog [#${key}](${url})`;
+		return `backlog [#${key}](https://${url})`;
 	}
 
 	public static makeGithubTag(key: string, url: string): string {
