@@ -1,8 +1,5 @@
 import backlogjs from "backlog-js";
-import type {
-	BacklogApiError,
-	BacklogError,
-} from "backlog-js/dist/types/error.js";
+import type { BacklogError } from "backlog-js/dist/types/error.js";
 import { fromPromise } from "neverthrow";
 import type { BacklogOptions, GithubIssue } from "../../type.js";
 
@@ -29,7 +26,10 @@ export class Backlog {
 		);
 
 		if (issueTypes.isErr()) {
-			console.debug(issueTypes.error, issueTypes.error.body);
+			console.debug(issueTypes.error, {
+				projectId: this.projectId,
+				issueTypeIdOrName: this.opts.issueTypeIdOrName,
+			});
 			throw new Error(`getIssueTypes failed: ${this.opts.issueTypeIdOrName}`);
 		}
 
@@ -50,7 +50,9 @@ export class Backlog {
 		);
 
 		if (priorities.isErr()) {
-			console.debug(priorities.error, priorities.error.body);
+			console.debug(priorities.error, {
+				projectId: this.projectId,
+			});
 			throw new Error(`getPriorities failed: ${this.opts.priorityIdOrName}`);
 		}
 
@@ -80,7 +82,10 @@ export class Backlog {
 		);
 
 		if (initialStatus.isErr()) {
-			console.debug(initialStatus.error, initialStatus.error.body);
+			console.debug(initialStatus.error, {
+				projectId: this.projectId,
+				initialStatusIdOrName: this.opts.initialStatusIdOrName,
+			});
 			throw new Error(
 				`getProjectStatuses failed: ${this.opts.initialStatusIdOrName}`,
 			);
@@ -102,20 +107,22 @@ export class Backlog {
 			githubIssue.html_url,
 		);
 
+		const payload: backlogjs.Option.Issue.PostIssueParams = {
+			projectId: this.projectId,
+			issueTypeId: this.issueType.id,
+			priorityId: this.priority.id,
+			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
+			statusId: foundInitialStatus.id,
+			description: `${githubTag}\n\n${githubIssue.body || ""}`,
+		};
+
 		const created = await fromPromise(
-			this.backlog.postIssue({
-				projectId: this.projectId,
-				issueTypeId: this.issueType.id,
-				priorityId: this.priority.id,
-				summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
-				statusId: foundInitialStatus.id,
-				description: `${githubTag}\n\n${githubIssue.body || ""}`,
-			}),
-			(e) => e as BacklogApiError,
+			this.backlog.postIssue(payload),
+			(e) => e as BacklogError,
 		);
 
 		if (created.isErr()) {
-			console.debug(created.error, await created.error.response.json());
+			console.debug(created.error, payload);
 			throw new Error(`postIssue failed: ${githubIssue.title}`);
 		}
 
@@ -127,19 +134,21 @@ export class Backlog {
 	public async issueUpdate(githubIssue: GithubIssue) {
 		const key = Backlog.extractBacklogTag(githubIssue.body);
 
+		const payload: backlogjs.Option.Issue.PatchIssueParams = {
+			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
+			description: `${Backlog.makeGithubTag(
+				githubIssue.number.toString(),
+				githubIssue.html_url,
+			)}\n\n${githubIssue.body || ""}`,
+		};
+
 		const updated = await fromPromise(
-			this.backlog.patchIssue(key, {
-				summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
-				description: `${Backlog.makeGithubTag(
-					githubIssue.number.toString(),
-					githubIssue.html_url,
-				)}\n\n${githubIssue.body || ""}`,
-			}),
+			this.backlog.patchIssue(key, payload),
 			(e) => e as BacklogError,
 		);
 
 		if (updated.isErr()) {
-			console.debug(updated.error, updated.error.body);
+			console.debug(updated.error, payload);
 			throw new Error(`patchIssue failed: ${githubIssue.title}`);
 		}
 	}
@@ -172,15 +181,17 @@ export class Backlog {
 			);
 		}
 
+		const payload: backlogjs.Option.Issue.PatchIssueParams = {
+			statusId: foundCompletedStatus.id,
+		};
+
 		const updated = await fromPromise(
-			this.backlog.patchIssue(key, {
-				statusId: foundCompletedStatus.id,
-			}),
+			this.backlog.patchIssue(key, payload),
 			(e) => e as BacklogError,
 		);
 
 		if (updated.isErr()) {
-			console.debug(updated.error, updated.error.body);
+			console.debug(updated.error, key, payload);
 			throw new Error(`patchIssue failed: ${githubIssue.title}`);
 		}
 	}
