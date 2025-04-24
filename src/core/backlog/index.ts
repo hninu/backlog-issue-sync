@@ -91,6 +91,8 @@ export class Backlog {
 			);
 		}
 
+		console.log(initialStatus);
+
 		const foundInitialStatus = initialStatus.value.find(
 			(s) =>
 				s.name === this.opts.initialStatusIdOrName ||
@@ -112,7 +114,6 @@ export class Backlog {
 			issueTypeId: this.issueType.id,
 			priorityId: this.priority.id,
 			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
-			statusId: foundInitialStatus.id,
 			description: `${githubTag}\n\n${githubIssue.body || ""}`,
 		};
 
