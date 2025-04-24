@@ -1,30 +1,23 @@
 import { Backlog } from "./index.js";
 
-// backlog-host: wmnbdev.backlog.com
-//     github-token: ***
-//     backlog-api-key: ***
-//     backlog-project-key: MFREBIRTH
-//     backlog-issue-type: 課題
-//     backlog-priority: 中
-//     backlog-initial-status: 未対応
-//     backlog-completed-status: 完了
+describe("Backlog.backlogRegex", () => {
+	it("extracts key when surrounded by text", () => {
+		const text = "foo backlog [#ABC-123](https://host/view/ABC-123) bar";
+		expect(Backlog.extractBacklogTag(text)).toBe("ABC-123");
+	});
+	it("is case insensitive", () => {
+		const text = "BaCkLoG [#XYZ](https://host/view/XYZ)";
+		expect(Backlog.extractBacklogTag(text)).toBe("XYZ");
+	});
+	it("returns null when no backlog tag present", () => {
+		const text = "no backlog here";
+		expect(Backlog.extractBacklogTag(text)).toBeNull();
+	});
+});
 
-it("test", async () => {
-	// const backlog = new Backlog({
-	// 	host: "wmnbdev.backlog.com",
-	// 	apiKey: "xxx",
-	// 	projectIdOrKey: "MFREBIRTH",
-	// 	issueTypeIdOrName: "課題",
-	// 	priorityIdOrName: "中",
-	// 	initialStatusIdOrName: "未対応",
-	// 	completedStatusIdOrName: "完了",
-	// });
-
-	// await backlog.init();
-	const text =
-		"aaabacklog [#MFREBIRTH-750](https://wmnbdev.backlog.com/view/MFREBIRTH-750)bbb";
-
-	const extracted = Backlog.extractBacklogTag(text);
-
-	expect(extracted).toBe("MFREBIRTH-750");
+describe("makeBacklogTag", () => {
+	it("creates proper markdown link", () => {
+		const tag = Backlog.makeBacklogTag("KEY", "wmnbdev.backlog.com");
+		expect(tag).toBe("backlog [#KEY](https://wmnbdev.backlog.com/view/KEY)");
+	});
 });
