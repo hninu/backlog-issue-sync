@@ -104,11 +104,9 @@ describe("BacklogIssueService (with mocked api)", () => {
 	it("should create a backlog issue and return tag", async () => {
 		await service.init();
 		const result = await service.createIssue(githubIssue);
-		if (result.isOk()) {
-			expect(result.value).toBe(
-				"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
-			);
-		}
+		expect(result).toBe(
+			"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
+		);
 	});
 
 	// Test updating a backlog issue and returning the tag
@@ -119,11 +117,9 @@ describe("BacklogIssueService (with mocked api)", () => {
 			body: "backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
 		};
 		const result = await service.updateIssue(issue);
-		if (result.isOk()) {
-			expect(result.value).toBe(
-				"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
-			);
-		}
+		expect(result).toBe(
+			"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
+		);
 	});
 
 	// Test closing a backlog issue and returning the tag
@@ -134,11 +130,9 @@ describe("BacklogIssueService (with mocked api)", () => {
 			body: "backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
 		};
 		const result = await service.closeIssue(issue);
-		if (result.isOk()) {
-			expect(result.value).toBe(
-				"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
-			);
-		}
+		expect(result).toBe(
+			"backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
+		);
 	});
 
 	// Test returning undefined if no backlog tag is present in updateIssue
@@ -148,9 +142,7 @@ describe("BacklogIssueService (with mocked api)", () => {
 			...githubIssue,
 			body: "no tag here",
 		});
-		if (result.isOk()) {
-			expect(result.value).toBeUndefined();
-		}
+		expect(result).toBeUndefined();
 	});
 
 	// Test returning undefined if no backlog tag is present in closeIssue
@@ -160,10 +152,7 @@ describe("BacklogIssueService (with mocked api)", () => {
 			...githubIssue,
 			body: "no tag here",
 		});
-
-		if (result.isOk()) {
-			expect(result.value).toBeUndefined();
-		}
+		expect(result).toBeUndefined();
 	});
 
 	// Test error handling when getProject fails in init
@@ -173,29 +162,20 @@ describe("BacklogIssueService (with mocked api)", () => {
 			isErr: () => true,
 			error: new Error("getProject failed"),
 		});
-
-		const result = await service.init();
-
-		if (result.isErr()) {
-			expect(result.error.message).toMatch("Failed to get project");
-		}
+		await expect(service.init()).rejects.toThrow("Failed to get project");
 	});
 
 	// Test error handling when postIssue fails in createIssue
 	it("should error if postIssue fails in createIssue", async () => {
 		await service.init();
-
 		api.postIssue = vi.fn().mockResolvedValue({
 			isOk: () => false,
 			isErr: () => true,
 			error: new Error("postIssue failed"),
 		});
-
-		const result = await service.createIssue(githubIssue);
-
-		if (result.isErr()) {
-			expect(result.error.message).toMatch("Failed to create issue");
-		}
+		await expect(service.createIssue(githubIssue)).rejects.toThrow(
+			"Failed to create issue",
+		);
 	});
 
 	// Test error handling when patchIssue fails in updateIssue
@@ -206,15 +186,12 @@ describe("BacklogIssueService (with mocked api)", () => {
 			isErr: () => true,
 			error: new Error("patchIssue failed"),
 		});
-
 		const issue = {
 			...githubIssue,
 			body: "backlog [#ABC-123](https://example.backlog.com/view/ABC-123)",
 		};
-		const result = await service.updateIssue(issue);
-
-		if (result.isErr()) {
-			expect(result.error.message).toMatch("Failed to update issue");
-		}
+		await expect(service.updateIssue(issue)).rejects.toThrow(
+			"Failed to update issue",
+		);
 	});
 });

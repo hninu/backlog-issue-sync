@@ -18,4 +18,5 @@ export interface GithubIssue {
 	state: "open" | "closed";
 	state_reason: string | null;
 	user: { login: string };
+	labels?: ({ name: string } | string)[];
 }

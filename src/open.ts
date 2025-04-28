@@ -19,6 +19,8 @@ export async function handleOpen({
 	const api = new BacklogApiClient(opts);
 	const service = new BacklogIssueService(api, opts);
 	await service.init();
+
+	// 例外throw型に対応
 	const backlogTag = await service.createIssue(issue);
 
 	const newBody = `${backlogTag}\n\n${issue.body || ""}`;

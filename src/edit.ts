@@ -8,5 +8,6 @@ export async function handleEdit({ issue }: { issue: GithubIssue }) {
 	const api = new BacklogApiClient(opts);
 	const service = new BacklogIssueService(api, opts);
 	await service.init();
+
 	return await service.updateIssue(issue);
 }

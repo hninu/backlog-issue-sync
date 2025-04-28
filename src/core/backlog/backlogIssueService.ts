@@ -1,5 +1,4 @@
 import type { Issue, Project } from "backlog-js/dist/types/entity.js";
-import { type Result, err, ok } from "neverthrow";
 import type { BacklogOptions, GithubIssue } from "../../type.js";
 import type { BacklogApiClient } from "./backlogApiClient.js";
 import {
@@ -51,51 +50,78 @@ export class BacklogIssueService {
 	/**
 	 * Initialize project, issue type, priority, and status info.
 	 */
-	public async init(): Promise<Result<void, Error>> {
+	public async init(): Promise<void> {
 		const projectRes = await this.api.getProject(this.opts.projectIdOrKey);
-		if (projectRes.isErr()) return err(new Error("Failed to get project"));
+		if (projectRes.isErr()) {
+			throw new Error(
+				`Failed to get project (projectIdOrKey: ${this.opts.projectIdOrKey})`,
+			);
+		}
 		this.projectId = projectRes.value.id;
 
 		const issueTypesRes = await this.api.getIssueTypes(this.projectId);
-		if (issueTypesRes.isErr())
-			return err(new Error("Failed to get issue types"));
+		if (issueTypesRes.isErr()) {
+			throw new Error(
+				`Failed to get issue types (projectId: ${this.projectId})`,
+			);
+		}
 		const foundType = issueTypesRes.value.find(
 			(t) =>
 				t.name === this.opts.issueTypeIdOrName ||
 				t.id === Number(this.opts.issueTypeIdOrName),
 		);
-		if (!foundType) return err(new Error("Issue type not found"));
+		if (!foundType) {
+			throw new Error(
+				`Issue type not found (issueTypeIdOrName: ${this.opts.issueTypeIdOrName})`,
+			);
+		}
 		this.issueType = foundType;
 
 		const prioritiesRes = await this.api.getPriorities();
-		if (prioritiesRes.isErr())
-			return err(new Error("Failed to get priorities"));
+		if (prioritiesRes.isErr()) {
+			throw new Error(`Failed to get priorities: ${this.opts.projectIdOrKey}`);
+		}
 		const foundPriority = prioritiesRes.value.find(
 			(p) =>
 				p.name === this.opts.priorityIdOrName ||
 				p.id === Number(this.opts.priorityIdOrName),
 		);
-		if (!foundPriority) return err(new Error("Priority not found"));
+		if (!foundPriority) {
+			throw new Error(
+				`Priority not found (priorityIdOrName: ${this.opts.priorityIdOrName})`,
+			);
+		}
 		this.priority = foundPriority;
 
 		const statusesRes = await this.api.getProjectStatuses(this.projectId);
-		if (statusesRes.isErr())
-			return err(new Error("Failed to get project statuses"));
+		if (statusesRes.isErr()) {
+			throw new Error(
+				`Failed to get project statuses (projectId: ${this.projectId})`,
+			);
+		}
 		const foundInitial = statusesRes.value.find(
 			(s) =>
 				s.name === this.opts.initialStatusIdOrName ||
 				s.id === Number(this.opts.initialStatusIdOrName),
 		);
-		if (!foundInitial) return err(new Error("Initial status not found"));
+		if (!foundInitial) {
+			throw new Error(
+				`Initial status not found (initialStatusIdOrName: ${this.opts.initialStatusIdOrName})`,
+			);
+		}
 		this.initialStatus = foundInitial;
+
 		const foundCompleted = statusesRes.value.find(
 			(s) =>
 				s.name === this.opts.completedStatusIdOrName ||
 				s.id === Number(this.opts.completedStatusIdOrName),
 		);
-		if (!foundCompleted) return err(new Error("Completed status not found"));
+		if (!foundCompleted) {
+			throw new Error(
+				`Completed status not found (completedStatusIdOrName: ${this.opts.completedStatusIdOrName})`,
+			);
+		}
 		this.completedStatus = foundCompleted;
-		return ok(undefined);
 	}
 
 	/**
@@ -103,11 +129,11 @@ export class BacklogIssueService {
 	 *
 	 * @param githubIssue GitHub issue.
 	 */
-	public async createIssue(
-		githubIssue: GithubIssue,
-	): Promise<Result<string, Error>> {
+	public async createIssue(githubIssue: GithubIssue): Promise<string> {
 		if (!this.issueType || !this.priority)
-			return err(new Error("Issue type or priority not found"));
+			throw new Error(
+				`Issue type or priority not found (issueTypeIdOrName: ${this.opts.issueTypeIdOrName}, priorityIdOrName: ${this.opts.priorityIdOrName})`,
+			);
 		const githubTag = makeGithubTag(
 			githubIssue.number.toString(),
 			githubIssue.html_url,
@@ -120,8 +146,12 @@ export class BacklogIssueService {
 			description: `${githubTag}\n\n${githubIssue.body || ""}`,
 		};
 		const createdRes = await this.api.postIssue(payload);
-		if (createdRes.isErr()) return err(new Error("Failed to create issue"));
-		return ok(makeBacklogTag(createdRes.value.issueKey, this.opts.host));
+		if (createdRes.isErr()) {
+			throw new Error(
+				`Failed to create issue (projectId: ${this.projectId}, issueTypeId: ${this.issueType.id}, priorityId: ${this.priority.id})`,
+			);
+		}
+		return makeBacklogTag(createdRes.value.issueKey, this.opts.host);
 	}
 
 	/**
@@ -131,10 +161,13 @@ export class BacklogIssueService {
 	 */
 	public async updateIssue(
 		githubIssue: GithubIssue,
-	): Promise<Result<string | undefined, Error>> {
-		if (!this.initialStatus) return err(new Error("Initial status not found"));
+	): Promise<string | undefined> {
+		if (!this.initialStatus)
+			throw new Error(
+				`Initial status not found (initialStatusIdOrName: ${this.opts.initialStatusIdOrName})`,
+			);
 		const key = extractBacklogTag(githubIssue.body || "");
-		if (key === null) return ok(undefined);
+		if (key === null) return undefined;
 		const githubTag = makeGithubTag(
 			githubIssue.number.toString(),
 			githubIssue.html_url,
@@ -149,8 +182,12 @@ export class BacklogIssueService {
 			statusId: this.initialStatus.id,
 		};
 		const updatedRes = await this.api.patchIssue(key, payload);
-		if (updatedRes.isErr()) return err(new Error("Failed to update issue"));
-		return ok(makeBacklogTag(key, this.opts.host));
+		if (updatedRes.isErr()) {
+			throw new Error(
+				`Failed to update issue (key: ${key}, statusId: ${this.initialStatus.id})`,
+			);
+		}
+		return makeBacklogTag(key, this.opts.host);
 	}
 
 	/**
@@ -160,14 +197,20 @@ export class BacklogIssueService {
 	 */
 	public async closeIssue(
 		githubIssue: GithubIssue,
-	): Promise<Result<string | undefined, Error>> {
+	): Promise<string | undefined> {
 		if (!this.completedStatus)
-			return err(new Error("Completed status not found"));
+			throw new Error(
+				`Completed status not found (completedStatusIdOrName: ${this.opts.completedStatusIdOrName})`,
+			);
 		const key = extractBacklogTag(githubIssue.body || "");
-		if (key === null) return ok(undefined);
+		if (key === null) return undefined;
 		const payload = { statusId: this.completedStatus.id };
 		const closedRes = await this.api.patchIssue(key, payload);
-		if (closedRes.isErr()) return err(new Error("Failed to close issue"));
-		return ok(makeBacklogTag(key, this.opts.host));
+		if (closedRes.isErr()) {
+			throw new Error(
+				`Failed to close issue (key: ${key}, statusId: ${this.completedStatus.id})`,
+			);
+		}
+		return makeBacklogTag(key, this.opts.host);
 	}
 }
