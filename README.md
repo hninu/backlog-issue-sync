@@ -52,7 +52,15 @@ jobs:
           backlog-completed-status: "Closed"
           backlog-summary-prefix: "Task | "
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          include-labels: "backlog, sync"
+          include-labels: |
+            ui
+            api
+          include-types: |
+            Bug
+            Task
+          assigneeIdMap: |
+            @github-user-id = @backlog-user-id
+            @github-user-id = @backlog-user-id
 ```
 
 ## Inputs / Secrets

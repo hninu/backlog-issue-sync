@@ -33,11 +33,20 @@ inputs:
   backlog-summary-prefix:
     description: "Optional prefix to add to the Backlog issue summary"
     required: false
+  backlog-start-date:
+    description: "Optional date for backlog start date"
+    required: false
+  backlog-due-date:
+    description: "Optional date for backlog due date"
+    required: false
   include-labels:
-    description: "Comma-separated label names: Action runs if any of these labels are present on the issue (if not set, runs on all issues)"
+    description: "Action runs if any of these labels are present on the issue (if not set, runs on all issues)"
     required: false
   include-types:
-    description: ""
+    description: "WIP"
+    required: false
+  assignee-id-map:
+    description: "WIP"
     required: false
   github-token:
     description: "GitHub token"

@@ -113231,14 +113231,15 @@ class BacklogIssueService {
         if (!this.issueType || !this.priority)
             throw new Error(`Issue type or priority not found (issueTypeIdOrName: ${this.opts.issueTypeIdOrName}, priorityIdOrName: ${this.opts.priorityIdOrName})`);
         const githubTag = makeGithubTag(githubIssue.number.toString(), githubIssue.html_url);
-        const payload = {
+        const createdRes = await this.api.postIssue({
             projectId: this.projectId,
             issueTypeId: this.issueType.id,
             priorityId: this.priority.id,
             summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
             description: `${githubTag}\n\n${githubIssue.body || ""}`,
-        };
-        const createdRes = await this.api.postIssue(payload);
+            // startDate: this.opts.
+            // dueDate:
+        });
         if (createdRes.isErr()) {
             throw new Error(`Failed to create issue (projectId: ${this.projectId}, issueTypeId: ${this.issueType.id}, priorityId: ${this.priority.id})`);
         }
@@ -113875,6 +113876,9 @@ function someIncludeTypes(issueType) {
     console.info(`[Types]: ${input.join(" ")}`);
     return input.some((type) => type === issueType);
 }
+// export function mapId(issueAssigneeId: string) {
+// 	const input = core.getMultilineInput('assignee-id-map')
+// }
 function getBacklogOptions() {
     return {
         host: coreExports.getInput("backlog-host", { required: true }),
@@ -113955,13 +113959,11 @@ async function run() {
         const { payload, repo } = githubExports.context;
         const issue = payload.issue;
         console.info(issue);
-        if (issue.labels && someIncludeLabels(issue.labels) === false) {
-            coreExports.info("Skipped: none of the include-labels found on this issue.");
-            return;
+        if (someIncludeLabels(issue.labels) === false) {
+            return coreExports.info("Skipped: none of the include-labels found on this issue.");
         }
-        if (issue.type && someIncludeTypes(issue.type.name) === false) {
-            coreExports.info("Skipped: none of the include-types found on this issue.");
-            return;
+        if (someIncludeTypes(issue.type?.name || "") === false) {
+            return coreExports.info("Skipped: none of the include-types found on this issue.");
         }
         // Handle issue reopened event
         if (issue.state === "open" && issue.state_reason === "reopened") {

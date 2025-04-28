@@ -25,14 +25,16 @@ export async function run(): Promise<void> {
 
 		console.info(issue);
 
-		if (issue.labels && someIncludeLabels(issue.labels) === false) {
-			core.info("Skipped: none of the include-labels found on this issue.");
-			return;
+		if (someIncludeLabels(issue.labels) === false) {
+			return core.info(
+				"Skipped: none of the include-labels found on this issue.",
+			);
 		}
 
-		if (issue.type && someIncludeTypes(issue.type.name) === false) {
-			core.info("Skipped: none of the include-types found on this issue.");
-			return;
+		if (someIncludeTypes(issue.type?.name || "") === false) {
+			return core.info(
+				"Skipped: none of the include-types found on this issue.",
+			);
 		}
 
 		// Handle issue reopened event

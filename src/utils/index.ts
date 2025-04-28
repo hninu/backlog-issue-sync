@@ -27,6 +27,11 @@ export function someIncludeTypes(issueType: string): boolean {
 	return input.some((type) => type === issueType);
 }
 
+// export function mapId(issueAssigneeId: string) {
+// 	const input = core.getMultilineInput('assignee-id-map')
+
+// }
+
 export function getBacklogOptions(): BacklogOptions {
 	return {
 		host: core.getInput("backlog-host", { required: true }),

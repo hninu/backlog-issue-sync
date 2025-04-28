@@ -138,14 +138,17 @@ export class BacklogIssueService {
 			githubIssue.number.toString(),
 			githubIssue.html_url,
 		);
-		const payload = {
+
+		const createdRes = await this.api.postIssue({
 			projectId: this.projectId,
 			issueTypeId: this.issueType.id,
 			priorityId: this.priority.id,
 			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
 			description: `${githubTag}\n\n${githubIssue.body || ""}`,
-		};
-		const createdRes = await this.api.postIssue(payload);
+			// startDate: this.opts.
+			// dueDate:
+		});
+
 		if (createdRes.isErr()) {
 			throw new Error(
 				`Failed to create issue (projectId: ${this.projectId}, issueTypeId: ${this.issueType.id}, priorityId: ${this.priority.id})`,
