@@ -52,7 +52,7 @@ jobs:
           backlog-completed-status: "Closed"
           backlog-summary-prefix: "Task | "
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          trigger-labels: "backlog, sync"
+          include-labels: "backlog, sync"
 ```
 
 ## Inputs / Secrets
@@ -68,7 +68,7 @@ jobs:
 | `backlog-completed-status`| Yes      | Status ID or name for completed Backlog issues                        | None    |
 | `backlog-summary-prefix`  | -        | Optional prefix for Backlog issue summary                             | None    |
 | `github-token`            | Yes      | GitHub token (e.g. `${{ secrets.GITHUB_TOKEN }}`)                     | None    |
-| `trigger-labels`          | -        | Comma-separated label names: Action runs if any of these labels are present on the issue | None    |
+| `include-labels`          | -        | Comma-separated label names: Action runs if any of these labels are present on the issue | None    |
 
 ## Setup
 

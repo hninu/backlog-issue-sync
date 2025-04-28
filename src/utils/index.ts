@@ -1,32 +1,28 @@
 import * as core from "@actions/core";
-import type { BacklogOptions } from "../type.js";
+import type { BacklogOptions, GithubIssue } from "../type.js";
 
 /**
  * Returns true if any of the triggerLabels is present in the issueLabels.
  * Accepts labels as string[] or { name: string }[] (GitHub API spec)
  */
-export function hasAnyTriggerLabel(
-	issueLabels: (string | { name: string })[] | undefined,
-	triggerLabels: string[],
-): boolean {
-	if (!triggerLabels.length) return true;
+export function someIncludeLabels(issueLabels: GithubIssue["labels"]): boolean {
+	const input = core.getMultilineInput("include-labels");
+
+	if (input.length === 0) return true;
+
 	const labels = (issueLabels || []).map((l) =>
 		typeof l === "string" ? l : l.name,
 	);
-	return triggerLabels.some((label) => labels.includes(label));
+
+	return labels.some((label) => input.includes(label));
 }
 
-/**
- * Gets the trigger-labels input as a string array (comma separated, trimmed, empty filtered)
- */
-export function getTriggerLabelsInput(): string[] {
-	const input = core.getInput("trigger-labels");
-	return input
-		? input
-				.split(",")
-				.map((s) => s.trim())
-				.filter(Boolean)
-		: [];
+export function someIncludeTypes(issueType: string): boolean {
+	const input = core.getMultilineInput("include-types");
+
+	if (input.length === 0) return true;
+
+	return input.some((type) => type === issueType);
 }
 
 export function getBacklogOptions(): BacklogOptions {

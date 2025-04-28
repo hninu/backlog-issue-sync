@@ -33,8 +33,11 @@ inputs:
   backlog-summary-prefix:
     description: "Optional prefix to add to the Backlog issue summary"
     required: false
-  trigger-labels:
+  include-labels:
     description: "Comma-separated label names: Action runs if any of these labels are present on the issue (if not set, runs on all issues)"
+    required: false
+  include-types:
+    description: ""
     required: false
   github-token:
     description: "GitHub token"

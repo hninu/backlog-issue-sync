@@ -12,7 +12,7 @@ import { handleEdit } from "./edit.js";
 import { handleOpen } from "./open.js";
 import { handleReopen } from "./reopen.js";
 import type { GithubIssue } from "./type.js";
-import { getTriggerLabelsInput, hasAnyTriggerLabel } from "./utils/index.js";
+import { someIncludeLabels } from "./utils/index.js";
 
 /**
  * Main runner for the Action. Dispatches to handlers based on issue event type and label filter.
@@ -23,14 +23,19 @@ export async function run(): Promise<void> {
 		const { payload, repo } = github.context;
 		const issue = payload.issue as GithubIssue;
 
-		// Parse trigger-labels input (comma-separated) and skip if none match
-		const triggerList = getTriggerLabelsInput();
-		if (triggerList.length && !hasAnyTriggerLabel(issue.labels, triggerList)) {
-			core.info(
-				`Skipped: none of the trigger-labels [${triggerList.join(", ")}] found on this issue.`,
-			);
+		console.info(issue);
+
+		// Parse include-labels input (comma-separated) and skip if none match
+
+		if (someIncludeLabels(issue.labels) === false) {
+			core.info("Skipped: none of the include-labels found on this issue.");
 			return;
 		}
+
+		// if (someIncludeTypes(issue.type) === false) {
+		// 	core.info("Skipped: none of the include-types found on this issue.");
+		// 	return;
+		// }
 
 		// Handle issue reopened event
 		if (issue.state === "open" && issue.state_reason === "reopened") {

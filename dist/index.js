@@ -88919,11 +88919,11 @@ function requireBody () {
 	return body;
 }
 
-var request$2;
+var request$3;
 var hasRequiredRequest$1;
 
 function requireRequest$1 () {
-	if (hasRequiredRequest$1) return request$2;
+	if (hasRequiredRequest$1) return request$3;
 	hasRequiredRequest$1 = 1;
 
 	const {
@@ -89422,8 +89422,8 @@ function requireRequest$1 () {
 	  }
 	}
 
-	request$2 = Request;
-	return request$2;
+	request$3 = Request;
+	return request$3;
 }
 
 var dispatcher;
@@ -97787,11 +97787,11 @@ function requireResponse () {
 
 /* globals AbortController */
 
-var request$1;
+var request$2;
 var hasRequiredRequest;
 
 function requireRequest () {
-	if (hasRequiredRequest) return request$1;
+	if (hasRequiredRequest) return request$2;
 	hasRequiredRequest = 1;
 
 	const { extractBody, mixinBody, cloneBody } = requireBody();
@@ -98735,8 +98735,8 @@ function requireRequest () {
 	  }
 	]);
 
-	request$1 = { Request, makeRequest };
-	return request$1;
+	request$2 = { Request, makeRequest };
+	return request$2;
 }
 
 var fetch_1;
@@ -109055,7 +109055,7 @@ function requireUtils$1 () {
 	return utils;
 }
 
-function getUserAgent() {
+function getUserAgent$2() {
     if (typeof navigator === "object" && "userAgent" in navigator) {
         return navigator.userAgent;
     }
@@ -109257,9 +109257,19 @@ function requireBeforeAfterHook () {
 
 var beforeAfterHookExports = requireBeforeAfterHook();
 
-const VERSION$5 = "9.0.6";
+function getUserAgent$1() {
+    if (typeof navigator === "object" && "userAgent" in navigator) {
+        return navigator.userAgent;
+    }
+    if (typeof process === "object" && process.version !== undefined) {
+        return `Node.js/${process.version.substr(1)} (${process.platform}; ${process.arch})`;
+    }
+    return "<environment undetectable>";
+}
 
-const userAgent = `octokit-endpoint.js/${VERSION$5} ${getUserAgent()}`;
+const VERSION$6 = "9.0.6";
+
+const userAgent = `octokit-endpoint.js/${VERSION$6} ${getUserAgent$1()}`;
 const DEFAULTS = {
   method: "GET",
   baseUrl: "https://api.github.com",
@@ -109282,7 +109292,7 @@ function lowercaseKeys(object) {
   }, {});
 }
 
-function isPlainObject$1(value) {
+function isPlainObject$2(value) {
   if (typeof value !== "object" || value === null)
     return false;
   if (Object.prototype.toString.call(value) !== "[object Object]")
@@ -109297,7 +109307,7 @@ function isPlainObject$1(value) {
 function mergeDeep(defaults, options) {
   const result = Object.assign({}, defaults);
   Object.keys(options).forEach((key) => {
-    if (isPlainObject$1(options[key])) {
+    if (isPlainObject$2(options[key])) {
       if (!(key in defaults))
         Object.assign(result, { [key]: options[key] });
       else
@@ -109575,22 +109585,22 @@ function endpointWithDefaults(defaults, route, options) {
   return parse(merge(defaults, route, options));
 }
 
-function withDefaults$2(oldDefaults, newDefaults) {
+function withDefaults$3(oldDefaults, newDefaults) {
   const DEFAULTS = merge(oldDefaults, newDefaults);
   const endpoint = endpointWithDefaults.bind(null, DEFAULTS);
   return Object.assign(endpoint, {
     DEFAULTS,
-    defaults: withDefaults$2.bind(null, DEFAULTS),
+    defaults: withDefaults$3.bind(null, DEFAULTS),
     merge: merge.bind(null, DEFAULTS),
     parse
   });
 }
 
-const endpoint = withDefaults$2(null, DEFAULTS);
+const endpoint = withDefaults$3(null, DEFAULTS);
 
-const VERSION$4 = "8.4.1";
+const VERSION$5 = "8.4.1";
 
-function isPlainObject(value) {
+function isPlainObject$1(value) {
   if (typeof value !== "object" || value === null)
     return false;
   if (Object.prototype.toString.call(value) !== "[object Object]")
@@ -109713,6 +109723,251 @@ function requireOnce () {
 
 var onceExports = requireOnce();
 var once = /*@__PURE__*/getDefaultExportFromCjs(onceExports);
+
+const logOnceCode$1 = once((deprecation) => console.warn(deprecation));
+const logOnceHeaders$1 = once((deprecation) => console.warn(deprecation));
+let RequestError$1 = class RequestError extends Error {
+  constructor(message, statusCode, options) {
+    super(message);
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+    this.name = "HttpError";
+    this.status = statusCode;
+    let headers;
+    if ("headers" in options && typeof options.headers !== "undefined") {
+      headers = options.headers;
+    }
+    if ("response" in options) {
+      this.response = options.response;
+      headers = options.response.headers;
+    }
+    const requestCopy = Object.assign({}, options.request);
+    if (options.request.headers.authorization) {
+      requestCopy.headers = Object.assign({}, options.request.headers, {
+        authorization: options.request.headers.authorization.replace(
+          /(?<! ) .*$/,
+          " [REDACTED]"
+        )
+      });
+    }
+    requestCopy.url = requestCopy.url.replace(/\bclient_secret=\w+/g, "client_secret=[REDACTED]").replace(/\baccess_token=\w+/g, "access_token=[REDACTED]");
+    this.request = requestCopy;
+    Object.defineProperty(this, "code", {
+      get() {
+        logOnceCode$1(
+          new Deprecation(
+            "[@octokit/request-error] `error.code` is deprecated, use `error.status`."
+          )
+        );
+        return statusCode;
+      }
+    });
+    Object.defineProperty(this, "headers", {
+      get() {
+        logOnceHeaders$1(
+          new Deprecation(
+            "[@octokit/request-error] `error.headers` is deprecated, use `error.response.headers`."
+          )
+        );
+        return headers || {};
+      }
+    });
+  }
+};
+
+function getBufferResponse$1(response) {
+  return response.arrayBuffer();
+}
+
+function fetchWrapper$1(requestOptions) {
+  const log = requestOptions.request && requestOptions.request.log ? requestOptions.request.log : console;
+  const parseSuccessResponseBody = requestOptions.request?.parseSuccessResponseBody !== false;
+  if (isPlainObject$1(requestOptions.body) || Array.isArray(requestOptions.body)) {
+    requestOptions.body = JSON.stringify(requestOptions.body);
+  }
+  let headers = {};
+  let status;
+  let url;
+  let { fetch } = globalThis;
+  if (requestOptions.request?.fetch) {
+    fetch = requestOptions.request.fetch;
+  }
+  if (!fetch) {
+    throw new Error(
+      "fetch is not set. Please pass a fetch implementation as new Octokit({ request: { fetch }}). Learn more at https://github.com/octokit/octokit.js/#fetch-missing"
+    );
+  }
+  return fetch(requestOptions.url, {
+    method: requestOptions.method,
+    body: requestOptions.body,
+    redirect: requestOptions.request?.redirect,
+    headers: requestOptions.headers,
+    signal: requestOptions.request?.signal,
+    // duplex must be set if request.body is ReadableStream or Async Iterables.
+    // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
+    ...requestOptions.body && { duplex: "half" }
+  }).then(async (response) => {
+    url = response.url;
+    status = response.status;
+    for (const keyAndValue of response.headers) {
+      headers[keyAndValue[0]] = keyAndValue[1];
+    }
+    if ("deprecation" in headers) {
+      const matches = headers.link && headers.link.match(/<([^<>]+)>; rel="deprecation"/);
+      const deprecationLink = matches && matches.pop();
+      log.warn(
+        `[@octokit/request] "${requestOptions.method} ${requestOptions.url}" is deprecated. It is scheduled to be removed on ${headers.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""}`
+      );
+    }
+    if (status === 204 || status === 205) {
+      return;
+    }
+    if (requestOptions.method === "HEAD") {
+      if (status < 400) {
+        return;
+      }
+      throw new RequestError$1(response.statusText, status, {
+        response: {
+          url,
+          status,
+          headers,
+          data: void 0
+        },
+        request: requestOptions
+      });
+    }
+    if (status === 304) {
+      throw new RequestError$1("Not modified", status, {
+        response: {
+          url,
+          status,
+          headers,
+          data: await getResponseData$1(response)
+        },
+        request: requestOptions
+      });
+    }
+    if (status >= 400) {
+      const data = await getResponseData$1(response);
+      const error = new RequestError$1(toErrorMessage$1(data), status, {
+        response: {
+          url,
+          status,
+          headers,
+          data
+        },
+        request: requestOptions
+      });
+      throw error;
+    }
+    return parseSuccessResponseBody ? await getResponseData$1(response) : response.body;
+  }).then((data) => {
+    return {
+      status,
+      url,
+      headers,
+      data
+    };
+  }).catch((error) => {
+    if (error instanceof RequestError$1)
+      throw error;
+    else if (error.name === "AbortError")
+      throw error;
+    let message = error.message;
+    if (error.name === "TypeError" && "cause" in error) {
+      if (error.cause instanceof Error) {
+        message = error.cause.message;
+      } else if (typeof error.cause === "string") {
+        message = error.cause;
+      }
+    }
+    throw new RequestError$1(message, 500, {
+      request: requestOptions
+    });
+  });
+}
+async function getResponseData$1(response) {
+  const contentType = response.headers.get("content-type");
+  if (/application\/json/.test(contentType)) {
+    return response.json().catch(() => response.text()).catch(() => "");
+  }
+  if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
+    return response.text();
+  }
+  return getBufferResponse$1(response);
+}
+function toErrorMessage$1(data) {
+  if (typeof data === "string")
+    return data;
+  let suffix;
+  if ("documentation_url" in data) {
+    suffix = ` - ${data.documentation_url}`;
+  } else {
+    suffix = "";
+  }
+  if ("message" in data) {
+    if (Array.isArray(data.errors)) {
+      return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}${suffix}`;
+    }
+    return `${data.message}${suffix}`;
+  }
+  return `Unknown error: ${JSON.stringify(data)}`;
+}
+
+function withDefaults$2(oldEndpoint, newDefaults) {
+  const endpoint = oldEndpoint.defaults(newDefaults);
+  const newApi = function(route, parameters) {
+    const endpointOptions = endpoint.merge(route, parameters);
+    if (!endpointOptions.request || !endpointOptions.request.hook) {
+      return fetchWrapper$1(endpoint.parse(endpointOptions));
+    }
+    const request = (route2, parameters2) => {
+      return fetchWrapper$1(
+        endpoint.parse(endpoint.merge(route2, parameters2))
+      );
+    };
+    Object.assign(request, {
+      endpoint,
+      defaults: withDefaults$2.bind(null, endpoint)
+    });
+    return endpointOptions.request.hook(request, endpointOptions);
+  };
+  return Object.assign(newApi, {
+    endpoint,
+    defaults: withDefaults$2.bind(null, endpoint)
+  });
+}
+
+const request$1 = withDefaults$2(endpoint, {
+  headers: {
+    "user-agent": `octokit-request.js/${VERSION$5} ${getUserAgent$2()}`
+  }
+});
+
+function getUserAgent() {
+    if (typeof navigator === "object" && "userAgent" in navigator) {
+        return navigator.userAgent;
+    }
+    if (typeof process === "object" && process.version !== undefined) {
+        return `Node.js/${process.version.substr(1)} (${process.platform}; ${process.arch})`;
+    }
+    return "<environment undetectable>";
+}
+
+const VERSION$4 = "8.4.1";
+
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null)
+    return false;
+  if (Object.prototype.toString.call(value) !== "[object Object]")
+    return false;
+  const proto = Object.getPrototypeOf(value);
+  if (proto === null)
+    return true;
+  const Ctor = Object.prototype.hasOwnProperty.call(proto, "constructor") && proto.constructor;
+  return typeof Ctor === "function" && Ctor instanceof Ctor && Function.prototype.call(Ctor) === Function.prototype.call(value);
+}
 
 const logOnceCode = once((deprecation) => console.warn(deprecation));
 const logOnceHeaders = once((deprecation) => console.warn(deprecation));
@@ -110105,7 +110360,7 @@ var noop = () => {
 };
 var consoleWarn = console.warn.bind(console);
 var consoleError = console.error.bind(console);
-var userAgentTrail = `octokit-core.js/${VERSION$2} ${getUserAgent()}`;
+var userAgentTrail = `octokit-core.js/${VERSION$2} ${getUserAgent$2()}`;
 var Octokit = class {
   static {
     this.VERSION = VERSION$2;
@@ -110155,7 +110410,7 @@ var Octokit = class {
   constructor(options = {}) {
     const hook = new beforeAfterHookExports.Collection();
     const requestDefaults = {
-      baseUrl: request.endpoint.DEFAULTS.baseUrl,
+      baseUrl: request$1.endpoint.DEFAULTS.baseUrl,
       headers: {},
       request: Object.assign({}, options.request, {
         // @ts-ignore internal usage only, no need to type
@@ -110176,7 +110431,7 @@ var Octokit = class {
     if (options.timeZone) {
       requestDefaults.headers["time-zone"] = options.timeZone;
     }
-    this.request = request.defaults(requestDefaults);
+    this.request = request$1.defaults(requestDefaults);
     this.graphql = withCustomRequest(this.request).defaults(requestDefaults);
     this.log = Object.assign(
       {
@@ -113605,23 +113860,12 @@ class BacklogApiClient {
  * Returns true if any of the triggerLabels is present in the issueLabels.
  * Accepts labels as string[] or { name: string }[] (GitHub API spec)
  */
-function hasAnyTriggerLabel(issueLabels, triggerLabels) {
-    if (!triggerLabels.length)
+function someIncludeLabels(issueLabels) {
+    const input = coreExports.getMultilineInput("include-labels");
+    if (input.length === 0)
         return true;
     const labels = (issueLabels || []).map((l) => typeof l === "string" ? l : l.name);
-    return triggerLabels.some((label) => labels.includes(label));
-}
-/**
- * Gets the trigger-labels input as a string array (comma separated, trimmed, empty filtered)
- */
-function getTriggerLabelsInput() {
-    const input = coreExports.getInput("trigger-labels");
-    return input
-        ? input
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
-        : [];
+    return labels.some((label) => input.includes(label));
 }
 function getBacklogOptions() {
     return {
@@ -113702,12 +113946,16 @@ async function run() {
         // Get GitHub context and issue data
         const { payload, repo } = githubExports.context;
         const issue = payload.issue;
-        // Parse trigger-labels input (comma-separated) and skip if none match
-        const triggerList = getTriggerLabelsInput();
-        if (triggerList.length && !hasAnyTriggerLabel(issue.labels, triggerList)) {
-            coreExports.info(`Skipped: none of the trigger-labels [${triggerList.join(", ")}] found on this issue.`);
+        console.info(issue);
+        // Parse include-labels input (comma-separated) and skip if none match
+        if (someIncludeLabels(issue.labels) === false) {
+            coreExports.info("Skipped: none of the include-labels found on this issue.");
             return;
         }
+        // if (someIncludeTypes(issue.type) === false) {
+        // 	core.info("Skipped: none of the include-types found on this issue.");
+        // 	return;
+        // }
         // Handle issue reopened event
         if (issue.state === "open" && issue.state_reason === "reopened") {
             const tag = await handleReopen({ issue });

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { GithubIssue } from "../../type.js";
 import { BacklogApiClient } from "./backlogApiClient.js";
 import { BacklogIssueService } from "./backlogIssueService.js";
 import * as backlogUtils from "./backlogUtils.js";
@@ -25,7 +26,7 @@ const githubIssue = {
 	state: "open",
 	state_reason: null,
 	user: { login: "test-user", id: 42 },
-} as const;
+} as GithubIssue;
 
 // Test suite for Backlog/GitHub tag utility functions
 describe("backlogUtils", () => {
