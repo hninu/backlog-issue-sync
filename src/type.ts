@@ -11,17 +11,15 @@ export interface BacklogOptions {
 	summaryPrefix?: string;
 }
 
-// export type GithubIssue {
-// 	id: number;
-// 	number: number;
-// 	title: string;
-// 	html_url: string;
-// 	body?: string;
-// 	state: "open" | "closed";
-// 	state_reason: string | null;
-// 	user: { login: string };
-// 	labels?: ({ name: string } | string)[];
-// 	type?: string;
-// }
-
-export type GithubIssue = Issue;
+export type GithubIssue = Issue & {
+	type: {
+		color: string;
+		created_at: string;
+		description: string;
+		id: number;
+		is_enabled: true;
+		name: string;
+		node_id: string;
+		updated_at: string;
+	};
+};

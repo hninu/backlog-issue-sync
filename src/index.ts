@@ -12,7 +12,7 @@ import { handleEdit } from "./edit.js";
 import { handleOpen } from "./open.js";
 import { handleReopen } from "./reopen.js";
 import type { GithubIssue } from "./type.js";
-import { someIncludeLabels } from "./utils/index.js";
+import { someIncludeLabels, someIncludeTypes } from "./utils/index.js";
 
 /**
  * Main runner for the Action. Dispatches to handlers based on issue event type and label filter.
@@ -25,17 +25,15 @@ export async function run(): Promise<void> {
 
 		console.info(issue);
 
-		// Parse include-labels input (comma-separated) and skip if none match
-
 		if (someIncludeLabels(issue.labels) === false) {
 			core.info("Skipped: none of the include-labels found on this issue.");
 			return;
 		}
 
-		// if (someIncludeTypes(issue.type) === false) {
-		// 	core.info("Skipped: none of the include-types found on this issue.");
-		// 	return;
-		// }
+		if (someIncludeTypes(issue.type.name) === false) {
+			core.info("Skipped: none of the include-types found on this issue.");
+			return;
+		}
 
 		// Handle issue reopened event
 		if (issue.state === "open" && issue.state_reason === "reopened") {

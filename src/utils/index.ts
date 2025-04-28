@@ -9,6 +9,7 @@ export function someIncludeLabels(issueLabels: GithubIssue["labels"]): boolean {
 	const input = core.getMultilineInput("include-labels");
 
 	if (input.length === 0) return true;
+	console.info(`[Labels]: ${input.join(" ")}`);
 
 	const labels = (issueLabels || []).map((l) =>
 		typeof l === "string" ? l : l.name,
@@ -21,6 +22,7 @@ export function someIncludeTypes(issueType: string): boolean {
 	const input = core.getMultilineInput("include-types");
 
 	if (input.length === 0) return true;
+	console.info(`[Types]: ${input.join(" ")}`);
 
 	return input.some((type) => type === issueType);
 }

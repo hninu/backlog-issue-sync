@@ -113864,8 +113864,16 @@ function someIncludeLabels(issueLabels) {
     const input = coreExports.getMultilineInput("include-labels");
     if (input.length === 0)
         return true;
+    console.info(`[Labels]: ${input.join(" ")}`);
     const labels = (issueLabels || []).map((l) => typeof l === "string" ? l : l.name);
     return labels.some((label) => input.includes(label));
+}
+function someIncludeTypes(issueType) {
+    const input = coreExports.getMultilineInput("include-types");
+    if (input.length === 0)
+        return true;
+    console.info(`[Types]: ${input.join(" ")}`);
+    return input.some((type) => type === issueType);
 }
 function getBacklogOptions() {
     return {
@@ -113947,15 +113955,14 @@ async function run() {
         const { payload, repo } = githubExports.context;
         const issue = payload.issue;
         console.info(issue);
-        // Parse include-labels input (comma-separated) and skip if none match
         if (someIncludeLabels(issue.labels) === false) {
             coreExports.info("Skipped: none of the include-labels found on this issue.");
             return;
         }
-        // if (someIncludeTypes(issue.type) === false) {
-        // 	core.info("Skipped: none of the include-types found on this issue.");
-        // 	return;
-        // }
+        if (someIncludeTypes(issue.type.name) === false) {
+            coreExports.info("Skipped: none of the include-types found on this issue.");
+            return;
+        }
         // Handle issue reopened event
         if (issue.state === "open" && issue.state_reason === "reopened") {
             const tag = await handleReopen({ issue });
