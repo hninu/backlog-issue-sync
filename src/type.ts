@@ -12,7 +12,7 @@ export interface BacklogOptions {
 }
 
 export type GithubIssue = Issue & {
-	type: {
+	type?: {
 		color: string;
 		created_at: string;
 		description: string;

@@ -113955,11 +113955,11 @@ async function run() {
         const { payload, repo } = githubExports.context;
         const issue = payload.issue;
         console.info(issue);
-        if (someIncludeLabels(issue.labels) === false) {
+        if (issue.labels && someIncludeLabels(issue.labels) === false) {
             coreExports.info("Skipped: none of the include-labels found on this issue.");
             return;
         }
-        if (someIncludeTypes(issue.type.name) === false) {
+        if (issue.type && someIncludeTypes(issue.type.name) === false) {
             coreExports.info("Skipped: none of the include-types found on this issue.");
             return;
         }
