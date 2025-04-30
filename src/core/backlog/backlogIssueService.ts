@@ -69,10 +69,33 @@ export class BacklogIssueService {
       throw new Error(
         `Issue type or priority not found (issueTypeIdOrName: ${this.opts.issueTypeIdOrName}, priorityIdOrName: ${this.opts.priorityIdOrName})`,
       );
+
     const githubTag = makeGithubTag(
       githubIssue.number.toString(),
       githubIssue.html_url,
     );
+
+    let assigneeId: number | undefined = undefined;
+
+    if (this.opts.assigneeIdMap) {
+      const backlogId = this.opts.assigneeIdMap
+        .find((pair) => pair[0] === githubIssue.user.login)
+        ?.at(1);
+
+      if (backlogId === undefined) {
+        throw new Error(
+          `Assignee not found (githubIssue.user.login: ${githubIssue.user.login})`,
+        );
+      }
+
+      const users = await this.api.getUsers();
+
+      if (users.isErr()) {
+        throw new Error("Failed to get users");
+      }
+
+      assigneeId = users.value.find((user) => user.userId === backlogId)?.id;
+    }
 
     const createdRes = await this.api.postIssue({
       projectId: this.projectId,
@@ -80,8 +103,13 @@ export class BacklogIssueService {
       priorityId: this.priority.id,
       summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
       description: `${githubTag}\n\n${githubIssue.body || ""}`,
-      // startDate: this.opts.
-      // dueDate:
+      assigneeId: assigneeId,
+      startDate: this.opts.backlogStartDate
+        ? new Date(this.opts.backlogStartDate).toISOString()
+        : undefined,
+      dueDate: this.opts.backlogDueDate
+        ? new Date(this.opts.backlogDueDate).toISOString()
+        : undefined,
     });
 
     if (createdRes.isErr()) {

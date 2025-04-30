@@ -20083,12 +20083,23 @@ var BacklogIssueService = class {
 	async createIssue(githubIssue) {
 		if (!this.issueType || !this.priority) throw new Error(`Issue type or priority not found (issueTypeIdOrName: ${this.opts.issueTypeIdOrName}, priorityIdOrName: ${this.opts.priorityIdOrName})`);
 		const githubTag = makeGithubTag(githubIssue.number.toString(), githubIssue.html_url);
+		let assigneeId = void 0;
+		if (this.opts.assigneeIdMap) {
+			const backlogId = this.opts.assigneeIdMap.find((pair) => pair[0] === githubIssue.user.login)?.at(1);
+			if (backlogId === void 0) throw new Error(`Assignee not found (githubIssue.user.login: ${githubIssue.user.login})`);
+			const users = await this.api.getUsers();
+			if (users.isErr()) throw new Error("Failed to get users");
+			assigneeId = users.value.find((user) => user.userId === backlogId)?.id;
+		}
 		const createdRes = await this.api.postIssue({
 			projectId: this.projectId,
 			issueTypeId: this.issueType.id,
 			priorityId: this.priority.id,
 			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
-			description: `${githubTag}\n\n${githubIssue.body || ""}`
+			description: `${githubTag}\n\n${githubIssue.body || ""}`,
+			assigneeId,
+			startDate: this.opts.backlogStartDate ? new Date(this.opts.backlogStartDate).toISOString() : void 0,
+			dueDate: this.opts.backlogDueDate ? new Date(this.opts.backlogDueDate).toISOString() : void 0
 		});
 		if (createdRes.isErr()) throw new Error(`Failed to create issue (projectId: ${this.projectId}, issueTypeId: ${this.issueType.id}, priorityId: ${this.priority.id})`);
 		return makeBacklogTag(createdRes.value.issueKey, this.opts.host);
@@ -23283,6 +23294,9 @@ var BacklogApiClient = class {
 	async getIssueTypes(projectId) {
 		return (0, import_index_cjs.fromPromise)(this.backlog.getIssueTypes(projectId), (e) => e);
 	}
+	async getUsers() {
+		return (0, import_index_cjs.fromPromise)(this.backlog.getUsers(), (e) => e);
+	}
 	/**
 	* Fetch available priorities.
 	* @returns Priorities or error.
@@ -23332,9 +23346,12 @@ var Input = class {
 			priorityIdOrName: this.getInput("backlog-priority", { required: true }),
 			initialStatusIdOrName: this.getInput("backlog-initial-status", { required: true }),
 			completedStatusIdOrName: this.getInput("backlog-completed-status", { required: true }),
-			summaryPrefix: this.getInput("backlog-summary-prefix", { required: false }) || void 0,
+			backlogStartDate: this.getInput("backlog-start-date", { required: false }) || null,
+			backlogDueDate: this.getInput("backlog-due-date", { required: false }) || null,
+			summaryPrefix: this.getInput("backlog-summary-prefix", { required: false }) || null,
 			includeLabels: this.getMultilineInput("include-labels"),
-			includeTypes: this.getMultilineInput("include-types")
+			includeTypes: this.getMultilineInput("include-types"),
+			assigneeIdMap: this.getAssigneeIdMap()
 		};
 	}
 	getAssigneeIdMap() {

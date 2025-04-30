@@ -1,5 +1,6 @@
 import * as _core from "@actions/core";
 import actionJson from "../../action.json" with { type: "json" };
+import type { BacklogOptions } from "../type.js";
 
 type Key = keyof typeof actionJson.inputs;
 
@@ -8,7 +9,7 @@ export class Input {
 
   // --- PUBLIC ---
 
-  public getBacklogOptions() {
+  public getBacklogOptions(): BacklogOptions {
     return {
       host: this.getInput("backlog-host", { required: true }),
       apiKey: this.getInput("backlog-api-key", { required: true }),
@@ -27,11 +28,15 @@ export class Input {
       completedStatusIdOrName: this.getInput("backlog-completed-status", {
         required: true,
       }),
+      backlogStartDate:
+        this.getInput("backlog-start-date", { required: false }) || null,
+      backlogDueDate:
+        this.getInput("backlog-due-date", { required: false }) || null,
       summaryPrefix:
-        this.getInput("backlog-summary-prefix", { required: false }) ||
-        undefined,
+        this.getInput("backlog-summary-prefix", { required: false }) || null,
       includeLabels: this.getMultilineInput("include-labels"),
       includeTypes: this.getMultilineInput("include-types"),
+      assigneeIdMap: this.getAssigneeIdMap(),
     };
   }
 

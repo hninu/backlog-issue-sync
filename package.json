@@ -26,8 +26,8 @@
     "coverage": "pnpx make-coverage-badge --output-path ./badges/coverage.svg",
     "check": "biome check . --write",
     "local-action": "pnpx @github/local-action . src/main.ts .env",
-    "package": "tsup src/index.ts",
-    "package:watch": "tsup src/index.ts --watch",
+    "package": "rolldown -c rolldown.config.ts",
+    "package:watch": "rolldown -c rolldown.config.ts --watch",
     "test": "vitest",
     "parse-action": "pnpx js-yaml action.yml > action.json",
     "all": "pnpm run parse-action && pnpm run check && CI=true pnpm run test && pnpm run coverage && pnpm run package"
@@ -48,7 +48,7 @@
     "@types/node": "20.17.30",
     "lefthook": "1.11.11",
     "make-coverage-badge": "1.2.0",
-    "tsup": "8.4.0",
+    "rolldown": "1.0.0-beta.8",
     "typescript": "5.8.3",
     "vitest": "3.1.2"
   },

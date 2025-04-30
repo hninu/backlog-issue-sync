@@ -14,8 +14,11 @@ const opts: BacklogOptions = {
   priorityIdOrName: "High",
   initialStatusIdOrName: "Open",
   completedStatusIdOrName: "Closed",
+  backlogStartDate: null,
+  backlogDueDate: null,
   includeLabels: [],
   includeTypes: [],
+  assigneeIdMap: null,
 };
 
 // Sample GitHub issue data
@@ -195,6 +198,57 @@ describe("BacklogIssueService (with mocked api)", () => {
     };
     await expect(service.updateIssue(issue)).rejects.toThrow(
       "Failed to update issue",
+    );
+  });
+
+  // Test: GitHubユーザーID→BacklogユーザーIDマッピング
+  it("should map github user to backlog assigneeId if assigneeIdMap is set", async () => {
+    const optsWithMap = {
+      ...opts,
+      assigneeIdMap: [["test-user", "user1"]] as [string, string][],
+    };
+    api = new BacklogApiClient(optsWithMap);
+    service = new BacklogIssueService(api, optsWithMap);
+
+    api.getUsers = vi.fn().mockResolvedValue({
+      isOk: () => true,
+      isErr: () => false,
+      value: [{ id: 111, userId: "user1" }],
+    });
+    api.getProject = vi.fn().mockResolvedValue({
+      isOk: () => true,
+      isErr: () => false,
+      value: { id: 1 },
+    });
+    api.getIssueTypes = vi.fn().mockResolvedValue({
+      isOk: () => true,
+      isErr: () => false,
+      value: [{ id: 2, name: "Bug" }],
+    });
+    api.getPriorities = vi.fn().mockResolvedValue({
+      isOk: () => true,
+      isErr: () => false,
+      value: [{ id: 3, name: "High" }],
+    });
+    api.getProjectStatuses = vi.fn().mockResolvedValue({
+      isOk: () => true,
+      isErr: () => false,
+      value: [
+        { id: 4, name: "Open" },
+        { id: 5, name: "Closed" },
+      ],
+    });
+    api.postIssue = vi.fn().mockResolvedValue({
+      isOk: () => true,
+      isErr: () => false,
+      value: { issueKey: "ABC-123" },
+    });
+
+    await service.init();
+    await service.createIssue(githubIssue);
+
+    expect(api.postIssue).toHaveBeenCalledWith(
+      expect.objectContaining({ assigneeId: 111 }),
     );
   });
 });

@@ -1,4 +1,4 @@
-import backlogjs from "backlog-js";
+import backlogjs, { type Entity } from "backlog-js";
 import type { Issue, Project } from "backlog-js/dist/types/entity.js";
 import type { BacklogError } from "backlog-js/dist/types/error.js";
 import { type Result, fromPromise } from "neverthrow";
@@ -47,6 +47,10 @@ export class BacklogApiClient {
       this.backlog.getIssueTypes(projectId),
       (e) => e as BacklogError,
     );
+  }
+
+  async getUsers(): Promise<Result<Entity.User.User[], BacklogError>> {
+    return fromPromise(this.backlog.getUsers(), (e) => e as BacklogError);
   }
 
   /**

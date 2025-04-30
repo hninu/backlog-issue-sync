@@ -1,6 +1,6 @@
 import type { Issue } from "@octokit/webhooks-types";
 
-export interface BacklogOptions {
+export type BacklogOptions = {
   host: string;
   apiKey: string;
   projectIdOrKey: string;
@@ -8,10 +8,13 @@ export interface BacklogOptions {
   priorityIdOrName: string;
   initialStatusIdOrName: string;
   completedStatusIdOrName: string;
-  summaryPrefix?: string;
+  backlogStartDate: string | null;
+  backlogDueDate: string | null;
+  summaryPrefix: string | null;
   includeLabels: string[];
   includeTypes: string[];
-}
+  assigneeIdMap: [string, string][] | null;
+};
 
 export type GithubIssue = Issue & {
   type?: {

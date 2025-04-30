@@ -1,4 +1,4 @@
-import type { Backlog as BacklogType } from "backlog-js";
+import type { Backlog as BacklogType, Entity } from "backlog-js";
 import type { Issue, Project } from "backlog-js/dist/types/entity.js";
 import { vi } from "vitest";
 
@@ -27,6 +27,11 @@ export const getStatuses = vi
     { id: 4, name: "Open" },
     { id: 5, name: "Closed" },
   ]);
+
+export const getUsers = vi.fn<BacklogType["getUsers"]>().mockResolvedValue([
+  { id: 1, userId: "user1" },
+  { id: 2, userId: "user2" },
+] as Entity.User.User[]);
 
 export const postIssue = vi
   .fn<BacklogType["postIssue"]>()
