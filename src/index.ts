@@ -12,7 +12,8 @@ import { handleEdit } from "./edit.js";
 import { handleOpen } from "./open.js";
 import { handleReopen } from "./reopen.js";
 import type { GithubIssue } from "./type.js";
-import { someIncludeLabels, someIncludeTypes } from "./utils/index.js";
+import { Input } from "./utils/Input.js";
+import { Validator } from "./utils/Validator.js";
 
 /**
  * Main runner for the Action. Dispatches to handlers based on issue event type and label filter.
@@ -23,19 +24,28 @@ export async function run(): Promise<void> {
 		const { payload, repo } = github.context;
 		const issue = payload.issue as GithubIssue;
 
-		console.info(issue);
+		console.debug(issue);
 
-		if (someIncludeLabels(issue.labels) === false) {
+		const input = new Input(core);
+		const opts = input.getBacklogOptions();
+
+		// --- validation ---
+
+		const validator = new Validator(issue, opts);
+
+		if (!validator.someIncludeLabels()) {
 			return core.info(
 				"Skipped: none of the include-labels found on this issue.",
 			);
 		}
 
-		if (someIncludeTypes(issue.type?.name || "") === false) {
+		if (!validator.someIncludeTypes()) {
 			return core.info(
 				"Skipped: none of the include-types found on this issue.",
 			);
 		}
+
+		// --- handle issue ---
 
 		// Handle issue reopened event
 		if (issue.state === "open" && issue.state_reason === "reopened") {
@@ -65,8 +75,8 @@ export async function run(): Promise<void> {
 			return core.info(`Finished handling closed issue: ${tag}`);
 		}
 	} catch (error) {
-		// Catch and handle any errors that occur during execution
-		if (error instanceof Error) core.setFailed(error.message);
+		console.debug(error)
+		core.setFailed(error instanceof Error ? error.message : String(error));
 	}
 }
 

@@ -22,13 +22,14 @@
 	},
 	"scripts": {
 		"postinstall": "pnpx lefthook install",
-		"bundle": "pnpm run check && pnpm run package",
+		"bundle": "pnpm run parse-action && pnpm run check && pnpm run package",
 		"coverage": "pnpx make-coverage-badge --output-path ./badges/coverage.svg",
 		"check": "biome check . --write",
 		"local-action": "pnpx @github/local-action . src/main.ts .env",
 		"package": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
 		"package:watch": "pnpm run package -- --watch",
 		"test": "vitest",
+		"parse-action": "pnpx js-yaml action.yml > action.json",
 		"all": "pnpm run check && CI=true pnpm run test && pnpm run coverage && pnpm run package"
 	},
 	"license": "MIT",

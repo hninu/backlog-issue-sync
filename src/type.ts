@@ -9,6 +9,8 @@ export interface BacklogOptions {
 	initialStatusIdOrName: string;
 	completedStatusIdOrName: string;
 	summaryPrefix?: string;
+	includeLabels: string[];
+	includeTypes: string[];
 }
 
 export type GithubIssue = Issue & {

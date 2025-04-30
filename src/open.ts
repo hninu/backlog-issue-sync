@@ -2,7 +2,7 @@ import * as github from "@actions/github";
 import { BacklogIssueService } from "./core/backlog/index.js";
 import { BacklogApiClient } from "./core/backlog/index.js";
 import type { GithubIssue } from "./type.js";
-import { getBacklogOptions, getGithubToken } from "./utils/index.js";
+import { Input } from "./utils/Input.js";
 
 export async function handleOpen({
 	issue,
@@ -11,8 +11,9 @@ export async function handleOpen({
 	issue: GithubIssue;
 	repo: { owner: string; repo: string };
 }) {
-	const opts = getBacklogOptions();
-	const token = getGithubToken();
+	const input = new Input();
+	const opts = input.getBacklogOptions();
+	const token = input.getGithubToken();
 
 	const octokit = github.getOctokit(token);
 

@@ -1,0 +1,71 @@
+{
+  "name": "Backlog Issue Sync",
+  "description": "Sync Backlog issues with GitHub issues",
+  "author": "hninu",
+  "branding": {
+    "icon": "heart",
+    "color": "red"
+  },
+  "inputs": {
+    "backlog-host": {
+      "description": "Backlog host name (e.g.: xxxxx.backlog.jp)",
+      "required": true
+    },
+    "backlog-api-key": {
+      "description": "Backlog API key",
+      "required": true
+    },
+    "backlog-project-key": {
+      "description": "Backlog project ID or key",
+      "required": true
+    },
+    "backlog-issue-type": {
+      "description": "Backlog issue type ID or name",
+      "required": true
+    },
+    "backlog-priority": {
+      "description": "Backlog priority ID or name",
+      "required": true
+    },
+    "backlog-initial-status": {
+      "description": "Backlog initial status ID or name (status applied to new issues when first created)",
+      "required": true
+    },
+    "backlog-completed-status": {
+      "description": "Backlog completed status ID or name (status applied when closing issues)",
+      "required": true
+    },
+    "backlog-summary-prefix": {
+      "description": "Optional prefix to add to the Backlog issue summary",
+      "required": false
+    },
+    "backlog-start-date": {
+      "description": "Optional date for backlog start date",
+      "required": false
+    },
+    "backlog-due-date": {
+      "description": "Optional date for backlog due date",
+      "required": false
+    },
+    "include-labels": {
+      "description": "Action runs if any of these labels are present on the issue (if not set, runs on all issues)",
+      "required": false
+    },
+    "include-types": {
+      "description": "WIP",
+      "required": false
+    },
+    "assignee-id-map": {
+      "description": "WIP",
+      "required": false
+    },
+    "github-token": {
+      "description": "GitHub token",
+      "required": true
+    }
+  },
+  "runs": {
+    "using": "node20",
+    "main": "dist/index.js"
+  }
+}
