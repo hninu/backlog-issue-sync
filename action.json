@@ -40,11 +40,11 @@
       "required": false
     },
     "backlog-start-date": {
-      "description": "Optional date for backlog start date",
+      "description": "Optional date for backlog start date. If set to 'today', uses today's date.",
       "required": false
     },
     "backlog-due-date": {
-      "description": "Optional date for backlog due date",
+      "description": "Optional date for backlog due date. If set to 'today', uses today's date.",
       "required": false
     },
     "include-labels": {

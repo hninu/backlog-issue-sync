@@ -87,10 +87,14 @@ export class BacklogIssueService {
       description: `${githubTag}\n\n${githubIssue.body || ""}`,
       assigneeId: assigneeId,
       startDate: this.opts.backlogStartDate
-        ? new Date(this.opts.backlogStartDate).toISOString()
+        ? this.opts.backlogStartDate === "today"
+          ? new Date().toISOString()
+          : new Date(this.opts.backlogStartDate).toISOString()
         : undefined,
       dueDate: this.opts.backlogDueDate
-        ? new Date(this.opts.backlogDueDate).toISOString()
+        ? this.opts.backlogDueDate === "today"
+          ? new Date().toISOString()
+          : new Date(this.opts.backlogDueDate).toISOString()
         : undefined,
     });
 
@@ -141,8 +145,6 @@ export class BacklogIssueService {
     });
 
     if (updatedRes.isErr()) {
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-      console.debug((updatedRes.error as any)._body.errors);
       console.error(updatedRes.error);
       throw new Error(
         `Failed to update issue (key: ${key}, statusId: ${this.initialStatus.id})`,
@@ -300,12 +302,11 @@ export class BacklogIssueService {
       throw new Error("Failed to get users");
     }
 
-    const assigneeId = users.value.find((user) => {
-      console.debug(`[getAssigneeId] user: ${user.name}`);
+    const assignee = users.value.find((user) => {
       return user.userId === backlogId || user.name.trim() === backlogId;
-    })?.id;
+    });
 
-    console.info(`Matched backlog user ID: ${assigneeId}`);
-    return assigneeId;
+    console.info(`Matched backlog user ID: ${assignee?.id}(${assignee?.name})`);
+    return assignee?.id;
   }
 }

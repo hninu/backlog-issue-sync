@@ -43,6 +43,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: hninu/backlog-issue-sync@v1
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           backlog-host: ${{ secrets.BACKLOG_HOST }}
           backlog-api-key: ${{ secrets.BACKLOG_API_KEY }}
           backlog-project-key: ${{ secrets.BACKLOG_PROJECT_KEY }}
@@ -51,7 +52,8 @@ jobs:
           backlog-initial-status: "Open"
           backlog-completed-status: "Closed"
           backlog-summary-prefix: "Task | "
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          backlog-start-date: "today"
+          backlog-due-date: "today"
           include-labels: |
             ui
             api
@@ -59,24 +61,28 @@ jobs:
             Bug
             Task
           assigneeIdMap: |
-            @github-user-id = @backlog-user-id
-            @github-user-id = @backlog-user-id
+            @github-user-id = @backlog-user-name
+            @github-user-id = @backlog-user-name
 ```
 
 ## Inputs / Secrets
 
-| Name                      | Required | Description                                                           | Default |
-|---------------------------|----------|-----------------------------------------------------------------------|---------|
-| `backlog-host`            | Yes      | Backlog host name (e.g. xxxxx.backlog.jp)                             | None    |
-| `backlog-api-key`         | Yes      | Backlog API key                                                       | None    |
-| `backlog-project-key`     | Yes      | Backlog project ID or key                                             | None    |
-| `backlog-issue-type`      | Yes      | Backlog issue type ID or name                                         | None    |
-| `backlog-priority`        | Yes      | Backlog priority ID or name                                           | None    |
-| `backlog-initial-status`  | Yes      | Status ID or name for new Backlog issues                              | None    |
-| `backlog-completed-status`| Yes      | Status ID or name for completed Backlog issues                        | None    |
-| `backlog-summary-prefix`  | -        | Optional prefix for Backlog issue summary                             | None    |
-| `github-token`            | Yes      | GitHub token (e.g. `${{ secrets.GITHUB_TOKEN }}`)                     | None    |
+| Name                      | Required | Description                                                                              | Default |
+|---------------------------|----------|------------------------------------------------------------------------------------------|---------|
+| `github-token`            | Yes      | GitHub token (e.g. `${{ secrets.GITHUB_TOKEN }}`)                                        | None    |
+| `backlog-host`            | Yes      | Backlog host name (e.g. xxxxx.backlog.jp)                                                | None    |
+| `backlog-api-key`         | Yes      | Backlog API key                                                                          | None    |
+| `backlog-project-key`     | Yes      | Backlog project ID or key                                                                | None    |
+| `backlog-issue-type`      | Yes      | Backlog issue type ID or name                                                            | None    |
+| `backlog-priority`        | Yes      | Backlog priority ID or name                                                              | None    |
+| `backlog-initial-status`  | Yes      | Status ID or name for new Backlog issues                                                 | None    |
+| `backlog-completed-status`| Yes      | Status ID or name for completed Backlog issues                                           | None    |
+| `backlog-summary-prefix`  | -        | Optional prefix for Backlog issue summary                                                | None    |
+| `backlog-start-date`      | -        | Optional date for backlog start date. If set to 'today', uses today's date.              | None    |
+| `backlog-due-date`        | -        | Optional date for backlog due date. If set to 'today', uses today's date.                | None    |
 | `include-labels`          | -        | Comma-separated label names: Action runs if any of these labels are present on the issue | None    |
+| `include-types`           | -        | Filter GitHub issues by type (e.g. Bug, Task)                                            | None    |
+| `assigneeIdMap`           | -        | Mapping between GitHub ID and Backlog user ID or names for assignee                      | None    |
 
 ## Setup
 
@@ -94,6 +100,8 @@ pnpm install
 ## License
 
 MIT
+
+---
 
 ## Contribution
 
@@ -180,5 +188,3 @@ MIT
 |-------------------|---------------------------------|
 | `coverage/`       | Test coverage output            |
 | `node_modules/`   | Installed dependencies          |
-
----
