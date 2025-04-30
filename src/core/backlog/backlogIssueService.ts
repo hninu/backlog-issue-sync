@@ -137,6 +137,7 @@ export class BacklogIssueService {
       description: replaced || "",
       statusId: this.initialStatus.id,
       assigneeId: assigneeId,
+      comment: `Updated from GitHub issue ${githubTag} (GitHub Action)`,
     });
 
     if (updatedRes.isErr()) {
@@ -300,8 +301,8 @@ export class BacklogIssueService {
     }
 
     const assigneeId = users.value.find((user) => {
-      console.debug(`[getAssigneeId] user: ${user.userId}`);
-      return user.userId === backlogId;
+      console.debug(`[getAssigneeId] user: ${user.name}`);
+      return user.userId === backlogId || user.name === backlogId;
     })?.id;
 
     console.info(`Matched backlog user ID: ${assigneeId}`);

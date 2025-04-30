@@ -20113,7 +20113,8 @@ var BacklogIssueService = class {
 			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
 			description: replaced || "",
 			statusId: this.initialStatus.id,
-			assigneeId
+			assigneeId,
+			comment: `Updated from GitHub issue ${githubTag} (GitHub Action)`
 		});
 		if (updatedRes.isErr()) {
 			console.debug(updatedRes.error._body.errors);
@@ -20194,8 +20195,8 @@ var BacklogIssueService = class {
 			throw new Error("Failed to get users");
 		}
 		const assigneeId = users.value.find((user) => {
-			console.debug(`[getAssigneeId] user: ${user.userId}`);
-			return user.userId === backlogId;
+			console.debug(`[getAssigneeId] user: ${user.name}`);
+			return user.userId === backlogId || user.name === backlogId;
 		})?.id;
 		console.info(`Matched backlog user ID: ${assigneeId}`);
 		return assigneeId;
