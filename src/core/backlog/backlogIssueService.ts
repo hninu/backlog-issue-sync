@@ -277,6 +277,9 @@ export class BacklogIssueService {
 
   private async getAssigneeId(githubId: string): Promise<number | undefined> {
     if (this.opts.assigneeIdMap === null) return undefined;
+    console.debug(
+      `[getAssigneeId] githubId: ${githubId}, backlogIdMap: ${this.opts.assigneeIdMap}`,
+    );
 
     const backlogId = this.opts.assigneeIdMap
       .find((pair) => pair[0] === githubId)
@@ -287,6 +290,7 @@ export class BacklogIssueService {
     }
 
     const users = await this.api.getProjectUsers(this.projectId);
+    console.debug(`[getAssigneeId] users: ${users}`);
 
     if (users.isErr()) {
       console.error(users.error);
