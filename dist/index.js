@@ -20083,14 +20083,7 @@ var BacklogIssueService = class {
 	async createIssue(githubIssue) {
 		if (!this.issueType || !this.priority) throw new Error(`Issue type or priority not found (issueTypeIdOrName: ${this.opts.issueTypeIdOrName}, priorityIdOrName: ${this.opts.priorityIdOrName})`);
 		const githubTag = makeGithubTag(githubIssue.number.toString(), githubIssue.html_url);
-		let assigneeId = void 0;
-		if (this.opts.assigneeIdMap) {
-			const backlogId = this.opts.assigneeIdMap.find((pair) => pair[0] === githubIssue.user.login)?.at(1);
-			if (backlogId === void 0) throw new Error(`Assignee not found (githubIssue.user.login: ${githubIssue.user.login})`);
-			const users = await this.api.getUsers();
-			if (users.isErr()) throw new Error("Failed to get users");
-			assigneeId = users.value.find((user) => user.userId === backlogId)?.id;
-		}
+		const assigneeId = await this.getAssigneeId(githubIssue.user.login);
 		const createdRes = await this.api.postIssue({
 			projectId: this.projectId,
 			issueTypeId: this.issueType.id,
@@ -20115,12 +20108,13 @@ var BacklogIssueService = class {
 		if (key === null) return void 0;
 		const githubTag = makeGithubTag(githubIssue.number.toString(), githubIssue.html_url);
 		const replaced = githubIssue.body?.replace(/backlog\s+\[#([A-Z0-9\-_]+)\]\(.*\)/i, githubTag);
-		const payload = {
+		const assigneeId = await this.getAssigneeId(githubIssue.user.login);
+		const updatedRes = await this.api.patchIssue(key, {
 			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
 			description: replaced || "",
-			statusId: this.initialStatus.id
-		};
-		const updatedRes = await this.api.patchIssue(key, payload);
+			statusId: this.initialStatus.id,
+			assigneeId
+		});
 		if (updatedRes.isErr()) throw new Error(`Failed to update issue (key: ${key}, statusId: ${this.initialStatus.id})`);
 		return makeBacklogTag(key, this.opts.host);
 	}
@@ -20180,6 +20174,14 @@ var BacklogIssueService = class {
 		const foundCompleted = res.value.find((s) => s.name === this.opts.completedStatusIdOrName || s.id === Number(this.opts.completedStatusIdOrName));
 		if (!foundCompleted) throw new Error(`Completed status not found: ${this.opts.completedStatusIdOrName}`);
 		this.completedStatus = foundCompleted;
+	}
+	async getAssigneeId(githubId) {
+		if (this.opts.assigneeIdMap === null) return void 0;
+		const backlogId = this.opts.assigneeIdMap.find((pair) => pair[0] === githubId)?.at(1);
+		if (backlogId === void 0) throw new Error(`Assignee not found (githubId: ${githubId})`);
+		const users = await this.api.getUsers();
+		if (users.isErr()) throw new Error("Failed to get users");
+		return users.value.find((user) => user.userId === backlogId)?.id;
 	}
 };
 
