@@ -1,64 +1,56 @@
 {
-	"name": "backlog-issue-sync",
-	"description": "GitHub Actions TypeScript template",
-	"version": "1.0.0-alpha.0",
-	"author": "@hninu",
-	"type": "module",
-	"private": true,
-	"homepage": "https://github.com/hninu/backlog-issue-sync",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/hninu/backlog-issue-sync.git"
-	},
-	"bugs": {
-		"url": "https://github.com/hninu/backlog-issue-sync/issues"
-	},
-	"keywords": ["actions"],
-	"exports": {
-		".": "./dist/index.js"
-	},
-	"engines": {
-		"node": ">=20"
-	},
-	"scripts": {
-		"postinstall": "pnpx lefthook install",
-		"bundle": "pnpm run parse-action && pnpm run check && pnpm run package",
-		"coverage": "pnpx make-coverage-badge --output-path ./badges/coverage.svg",
-		"check": "biome check . --write",
-		"local-action": "pnpx @github/local-action . src/main.ts .env",
-		"package": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
-		"package:watch": "pnpm run package -- --watch",
-		"test": "vitest",
-		"parse-action": "pnpx js-yaml action.yml > action.json",
-		"all": "pnpm run check && CI=true pnpm run test && pnpm run coverage && pnpm run package"
-	},
-	"license": "MIT",
-	"dependencies": {
-		"@actions/core": "1.11.1",
-		"@actions/github": "6.0.0",
-		"backlog-js": "0.13.3",
-		"isomorphic-fetch": "3.0.0",
-		"isomorphic-form-data": "2.0.0",
-		"neverthrow": "8.2.0",
-		"octokit": "^4.1.3"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
-		"@github/local-action": "3.1.4",
-		"@octokit/webhooks-types": "^7.6.1",
-		"@rollup/plugin-commonjs": "28.0.1",
-		"@rollup/plugin-json": "6.1.0",
-		"@rollup/plugin-node-resolve": "16.0.1",
-		"@rollup/plugin-typescript": "12.1.1",
-		"@types/node": "20.17.30",
-		"lefthook": "1.11.11",
-		"make-coverage-badge": "1.2.0",
-		"rollup": "4.40.0",
-		"typescript": "5.8.3",
-		"vitest": "3.1.2"
-	},
-	"optionalDependencies": {
-		"@rollup/rollup-linux-x64-gnu": "^4.40.0"
-	},
-	"packageManager": "pnpm@10.9.0+sha512.0486e394640d3c1fb3c9d43d49cf92879ff74f8516959c235308f5a8f62e2e19528a65cdc2a3058f587cde71eba3d5b56327c8c33a97e4c4051ca48a10ca2d5f"
+  "name": "backlog-issue-sync",
+  "description": "GitHub Actions TypeScript template",
+  "version": "1.0.0-alpha.0",
+  "author": "@hninu",
+  "type": "module",
+  "private": true,
+  "homepage": "https://github.com/hninu/backlog-issue-sync",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hninu/backlog-issue-sync.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hninu/backlog-issue-sync/issues"
+  },
+  "keywords": ["actions"],
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "postinstall": "pnpx lefthook install",
+    "bundle": "pnpm run parse-action && pnpm run check && pnpm run package",
+    "coverage": "pnpx make-coverage-badge --output-path ./badges/coverage.svg",
+    "check": "biome check . --write",
+    "local-action": "pnpx @github/local-action . src/main.ts .env",
+    "package": "tsup src/index.ts --format esm --d dist --sourcemap",
+    "package:watch": "tsup src/index.ts --format esm,cjs --d dist --sourcemap --watch",
+    "test": "vitest",
+    "parse-action": "pnpx js-yaml action.yml > action.json",
+    "all": "pnpm run parse-action && pnpm run check && CI=true pnpm run test && pnpm run coverage && pnpm run package"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "1.11.1",
+    "@actions/github": "6.0.0",
+    "backlog-js": "0.13.3",
+    "isomorphic-fetch": "3.0.0",
+    "isomorphic-form-data": "2.0.0",
+    "neverthrow": "8.2.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@github/local-action": "3.1.4",
+    "@octokit/webhooks-types": "^7.6.1",
+    "@types/node": "20.17.30",
+    "lefthook": "1.11.11",
+    "make-coverage-badge": "1.2.0",
+    "tsup": "8.4.0",
+    "typescript": "5.8.3",
+    "vitest": "3.1.2"
+  },
+  "packageManager": "pnpm@10.9.0+sha512.0486e394640d3c1fb3c9d43d49cf92879ff74f8516959c235308f5a8f62e2e19528a65cdc2a3058f587cde71eba3d5b56327c8c33a97e4c4051ca48a10ca2d5f"
 }

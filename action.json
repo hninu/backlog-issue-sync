@@ -52,11 +52,11 @@
       "required": false
     },
     "include-types": {
-      "description": "WIP",
+      "description": "Filter GitHub issues by type (e.g. Bug, Task) - only issues with these types will be processed",
       "required": false
     },
     "assignee-id-map": {
-      "description": "WIP",
+      "description": "Mapping between GitHub and Backlog user IDs in format '@github-user = @backlog-user' (one mapping per line)",
       "required": false
     },
     "github-token": {

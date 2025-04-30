@@ -4,11 +4,11 @@ import type { GithubIssue } from "./type.js";
 import { Input } from "./utils/Input.js";
 
 export async function handleClosed({ issue }: { issue: GithubIssue }) {
-	const input = new Input();
-	const opts = input.getBacklogOptions();
-	const api = new BacklogApiClient(opts);
-	const service = new BacklogIssueService(api, opts);
-	await service.init();
+  const input = new Input();
+  const opts = input.getBacklogOptions();
+  const api = new BacklogApiClient(opts);
+  const service = new BacklogIssueService(api, opts);
+  await service.init();
 
-	return await service.closeIssue(issue);
+  return await service.closeIssue(issue);
 }
