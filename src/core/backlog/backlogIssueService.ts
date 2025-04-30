@@ -280,7 +280,7 @@ export class BacklogIssueService {
       throw new Error(`Assignee not found (githubId: ${githubId})`);
     }
 
-    const users = await this.api.getUsers();
+    const users = await this.api.getProjectUsers(this.projectId);
 
     if (users.isErr()) {
       throw new Error("Failed to get users");

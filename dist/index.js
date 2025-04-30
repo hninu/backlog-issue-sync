@@ -20179,7 +20179,7 @@ var BacklogIssueService = class {
 		if (this.opts.assigneeIdMap === null) return void 0;
 		const backlogId = this.opts.assigneeIdMap.find((pair) => pair[0] === githubId)?.at(1);
 		if (backlogId === void 0) throw new Error(`Assignee not found (githubId: ${githubId})`);
-		const users = await this.api.getUsers();
+		const users = await this.api.getProjectUsers(this.projectId);
 		if (users.isErr()) throw new Error("Failed to get users");
 		return users.value.find((user) => user.userId === backlogId)?.id;
 	}
@@ -23296,8 +23296,8 @@ var BacklogApiClient = class {
 	async getIssueTypes(projectId) {
 		return (0, import_index_cjs.fromPromise)(this.backlog.getIssueTypes(projectId), (e) => e);
 	}
-	async getUsers() {
-		return (0, import_index_cjs.fromPromise)(this.backlog.getUsers(), (e) => e);
+	async getProjectUsers(projectId) {
+		return (0, import_index_cjs.fromPromise)(this.backlog.getProjectUsers(projectId), (e) => e);
 	}
 	/**
 	* Fetch available priorities.

@@ -210,7 +210,7 @@ describe("BacklogIssueService (with mocked api)", () => {
     api = new BacklogApiClient(optsWithMap);
     service = new BacklogIssueService(api, optsWithMap);
 
-    api.getUsers = vi.fn().mockResolvedValue({
+    api.getProjectUsers = vi.fn().mockResolvedValue({
       isOk: () => true,
       isErr: () => false,
       value: [{ id: 111, userId: "user1" }],

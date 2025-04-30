@@ -49,8 +49,13 @@ export class BacklogApiClient {
     );
   }
 
-  async getUsers(): Promise<Result<Entity.User.User[], BacklogError>> {
-    return fromPromise(this.backlog.getUsers(), (e) => e as BacklogError);
+  async getProjectUsers(
+    projectId: number,
+  ): Promise<Result<Entity.User.User[], BacklogError>> {
+    return fromPromise(
+      this.backlog.getProjectUsers(projectId),
+      (e) => e as BacklogError,
+    );
   }
 
   /**
