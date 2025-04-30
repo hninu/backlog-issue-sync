@@ -20196,7 +20196,7 @@ var BacklogIssueService = class {
 		}
 		const assigneeId = users.value.find((user) => {
 			console.debug(`[getAssigneeId] user: ${user.name}`);
-			return user.userId === backlogId || user.name === backlogId;
+			return user.userId === backlogId || user.name.trim() === backlogId;
 		})?.id;
 		console.info(`Matched backlog user ID: ${assigneeId}`);
 		return assigneeId;
