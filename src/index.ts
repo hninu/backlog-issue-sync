@@ -44,6 +44,15 @@ export async function run(): Promise<void> {
 
     // Handle issue reopened event
     if (issue.state === "open" && issue.state_reason === "reopened") {
+      // Check for existing Backlog tag in issue body
+      const existBacklogTag = extractBacklogTag(issue.body || "");
+
+      // If no Backlog tag, treat as newly opened
+      if (existBacklogTag === null) {
+        const tag = await handleOpen({ issue, repo });
+        return core.info(`Finished handling opened issue: ${tag}`);
+      }
+
       const tag = await handleReopen({ issue });
       return core.info(`Finished handling reopened issue: ${tag}`);
     }

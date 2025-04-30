@@ -52,8 +52,8 @@ jobs:
           backlog-initial-status: "Open"
           backlog-completed-status: "Closed"
           backlog-summary-prefix: "Task | "
-          backlog-start-date: "today"
-          backlog-due-date: "today"
+          backlog-start-date: date -d "tomorrow" +%Y-%m-%d
+          backlog-due-date: date -d "6 days" +%Y-%m-%d
           include-labels: |
             ui
             api
