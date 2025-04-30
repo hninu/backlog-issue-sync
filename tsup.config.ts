@@ -6,7 +6,7 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
-  format: ["esm"],
+  format: ["cjs"],
   external: ["punycode"],
   noExternal: [/(.*)/],
 });
