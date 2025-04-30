@@ -240,6 +240,7 @@ export class BacklogIssueService {
     }
     const res = await this.api.getProjectStatuses(this.projectId);
     if (res.isErr()) {
+      console.error(res.error);
       throw new Error(
         `Failed to get project statuses (projectId: ${this.projectId})`,
       );
@@ -283,6 +284,7 @@ export class BacklogIssueService {
     const users = await this.api.getProjectUsers(this.projectId);
 
     if (users.isErr()) {
+      console.error(users.error);
       throw new Error("Failed to get users");
     }
 

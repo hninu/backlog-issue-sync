@@ -20167,7 +20167,10 @@ var BacklogIssueService = class {
 	async initStatuses() {
 		if (!this.projectId) throw new Error("Project not initialized");
 		const res = await this.api.getProjectStatuses(this.projectId);
-		if (res.isErr()) throw new Error(`Failed to get project statuses (projectId: ${this.projectId})`);
+		if (res.isErr()) {
+			console.error(res.error);
+			throw new Error(`Failed to get project statuses (projectId: ${this.projectId})`);
+		}
 		const foundInitial = res.value.find((s) => s.name === this.opts.initialStatusIdOrName || s.id === Number(this.opts.initialStatusIdOrName));
 		if (!foundInitial) throw new Error(`Initial status not found: ${this.opts.initialStatusIdOrName}`);
 		this.initialStatus = foundInitial;
@@ -20180,7 +20183,10 @@ var BacklogIssueService = class {
 		const backlogId = this.opts.assigneeIdMap.find((pair) => pair[0] === githubId)?.at(1);
 		if (backlogId === void 0) throw new Error(`Assignee not found (githubId: ${githubId})`);
 		const users = await this.api.getProjectUsers(this.projectId);
-		if (users.isErr()) throw new Error("Failed to get users");
+		if (users.isErr()) {
+			console.error(users.error);
+			throw new Error("Failed to get users");
+		}
 		return users.value.find((user) => user.userId === backlogId)?.id;
 	}
 };
