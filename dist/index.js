@@ -23491,6 +23491,14 @@ async function run() {
 		if (!validator.someIncludeLabels()) return import_core.info("Skipped: none of the include-labels found on this issue.");
 		if (!validator.someIncludeTypes()) return import_core.info("Skipped: none of the include-types found on this issue.");
 		if (issue$1.state === "open" && issue$1.state_reason === "reopened") {
+			const existBacklogTag = extractBacklogTag(issue$1.body || "");
+			if (existBacklogTag === null) {
+				const tag$1 = await handleOpen({
+					issue: issue$1,
+					repo
+				});
+				return import_core.info(`Finished handling opened issue: ${tag$1}`);
+			}
 			const tag = await handleReopen({ issue: issue$1 });
 			return import_core.info(`Finished handling reopened issue: ${tag}`);
 		}
