@@ -20192,7 +20192,10 @@ var BacklogIssueService = class {
 			console.error(users.error);
 			throw new Error("Failed to get users");
 		}
-		const assigneeId = users.value.find((user) => user.userId === backlogId)?.id;
+		const assigneeId = users.value.find((user) => {
+			console.debug(`[getAssigneeId] user: ${user}`);
+			return user.userId === backlogId;
+		})?.id;
 		console.info(`Matched backlog user ID: ${assigneeId}`);
 		return assigneeId;
 	}
