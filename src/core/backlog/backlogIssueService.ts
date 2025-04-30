@@ -75,7 +75,9 @@ export class BacklogIssueService {
       githubIssue.html_url,
     );
 
-    const assigneeId = await this.getAssigneeId(githubIssue.user.login);
+    const assigneeId = githubIssue.assignee
+      ? await this.getAssigneeId(githubIssue.assignee.login)
+      : undefined;
 
     const createdRes = await this.api.postIssue({
       projectId: this.projectId,
@@ -126,7 +128,9 @@ export class BacklogIssueService {
       githubTag,
     );
 
-    const assigneeId = await this.getAssigneeId(githubIssue.user.login);
+    const assigneeId = githubIssue.assignee
+      ? await this.getAssigneeId(githubIssue.assignee.login)
+      : undefined;
 
     const updatedRes = await this.api.patchIssue(key, {
       summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
@@ -136,6 +140,7 @@ export class BacklogIssueService {
     });
 
     if (updatedRes.isErr()) {
+      console.error(updatedRes.error);
       throw new Error(
         `Failed to update issue (key: ${key}, statusId: ${this.initialStatus.id})`,
       );
@@ -288,6 +293,11 @@ export class BacklogIssueService {
       throw new Error("Failed to get users");
     }
 
-    return users.value.find((user) => user.userId === backlogId)?.id;
+    const assigneeId = users.value.find(
+      (user) => user.userId === backlogId,
+    )?.id;
+
+    console.info(`Matched backlog user ID: ${assigneeId}`);
+    return assigneeId;
   }
 }

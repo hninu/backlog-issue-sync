@@ -20083,7 +20083,7 @@ var BacklogIssueService = class {
 	async createIssue(githubIssue) {
 		if (!this.issueType || !this.priority) throw new Error(`Issue type or priority not found (issueTypeIdOrName: ${this.opts.issueTypeIdOrName}, priorityIdOrName: ${this.opts.priorityIdOrName})`);
 		const githubTag = makeGithubTag(githubIssue.number.toString(), githubIssue.html_url);
-		const assigneeId = await this.getAssigneeId(githubIssue.user.login);
+		const assigneeId = githubIssue.assignee ? await this.getAssigneeId(githubIssue.assignee.login) : void 0;
 		const createdRes = await this.api.postIssue({
 			projectId: this.projectId,
 			issueTypeId: this.issueType.id,
@@ -20108,14 +20108,17 @@ var BacklogIssueService = class {
 		if (key === null) return void 0;
 		const githubTag = makeGithubTag(githubIssue.number.toString(), githubIssue.html_url);
 		const replaced = githubIssue.body?.replace(/backlog\s+\[#([A-Z0-9\-_]+)\]\(.*\)/i, githubTag);
-		const assigneeId = await this.getAssigneeId(githubIssue.user.login);
+		const assigneeId = githubIssue.assignee ? await this.getAssigneeId(githubIssue.assignee.login) : void 0;
 		const updatedRes = await this.api.patchIssue(key, {
 			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
 			description: replaced || "",
 			statusId: this.initialStatus.id,
 			assigneeId
 		});
-		if (updatedRes.isErr()) throw new Error(`Failed to update issue (key: ${key}, statusId: ${this.initialStatus.id})`);
+		if (updatedRes.isErr()) {
+			console.error(updatedRes.error);
+			throw new Error(`Failed to update issue (key: ${key}, statusId: ${this.initialStatus.id})`);
+		}
 		return makeBacklogTag(key, this.opts.host);
 	}
 	/**
@@ -20187,7 +20190,9 @@ var BacklogIssueService = class {
 			console.error(users.error);
 			throw new Error("Failed to get users");
 		}
-		return users.value.find((user) => user.userId === backlogId)?.id;
+		const assigneeId = users.value.find((user) => user.userId === backlogId)?.id;
+		console.info(`Matched backlog user ID: ${assigneeId}`);
+		return assigneeId;
 	}
 };
 
