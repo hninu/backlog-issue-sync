@@ -6,6 +6,5 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   format: ["esm"],
-  minify: true,
   noExternal: [/(.*)/],
 });
