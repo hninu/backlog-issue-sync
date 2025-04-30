@@ -26,8 +26,8 @@
     "coverage": "pnpx make-coverage-badge --output-path ./badges/coverage.svg",
     "check": "biome check . --write",
     "local-action": "pnpx @github/local-action . src/main.ts .env",
-    "package": "tsup src/index.ts --format esm --d dist --sourcemap",
-    "package:watch": "tsup src/index.ts --format esm,cjs --d dist --sourcemap --watch",
+    "package": "tsup-node src/index.ts",
+    "package:watch": "tsup-node src/index.ts --watch",
     "test": "vitest",
     "parse-action": "pnpx js-yaml action.yml > action.json",
     "all": "pnpm run parse-action && pnpm run check && CI=true pnpm run test && pnpm run coverage && pnpm run package"

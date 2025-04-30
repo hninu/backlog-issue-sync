@@ -11,8 +11,7 @@ import { extractBacklogTag } from "./core/backlog/backlogUtils.js";
 import { handleEdit } from "./edit.js";
 import { handleOpen } from "./open.js";
 import { handleReopen } from "./reopen.js";
-// biome-ignore lint/style/useImportType: <explanation>
-import { GithubIssue } from "./type.js";
+import type { GithubIssue } from "./type.js";
 import { Input } from "./utils/Input.js";
 import { Validator } from "./utils/Validator.js";
 
