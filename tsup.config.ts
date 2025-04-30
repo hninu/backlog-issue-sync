@@ -7,6 +7,6 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   format: "esm",
-  external: ["punycode"],
+  // tsup を除く全てのモジュールをバンドル
   noExternal: [/(.*)/],
 });

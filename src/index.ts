@@ -1,8 +1,3 @@
-// Main entry point for the GitHub Action
-// Handles event routing and label-based filtering
-
-import "isomorphic-fetch";
-
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 
