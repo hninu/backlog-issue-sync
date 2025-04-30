@@ -20116,6 +20116,7 @@ var BacklogIssueService = class {
 			assigneeId
 		});
 		if (updatedRes.isErr()) {
+			console.debug(updatedRes.error._body.errors);
 			console.error(updatedRes.error);
 			throw new Error(`Failed to update issue (key: ${key}, statusId: ${this.initialStatus.id})`);
 		}
@@ -20193,7 +20194,7 @@ var BacklogIssueService = class {
 			throw new Error("Failed to get users");
 		}
 		const assigneeId = users.value.find((user) => {
-			console.debug(`[getAssigneeId] user: ${user}`);
+			console.debug(`[getAssigneeId] user: ${user.userId}`);
 			return user.userId === backlogId;
 		})?.id;
 		console.info(`Matched backlog user ID: ${assigneeId}`);

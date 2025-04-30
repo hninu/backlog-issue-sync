@@ -140,6 +140,8 @@ export class BacklogIssueService {
     });
 
     if (updatedRes.isErr()) {
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      console.debug((updatedRes.error as any)._body.errors);
       console.error(updatedRes.error);
       throw new Error(
         `Failed to update issue (key: ${key}, statusId: ${this.initialStatus.id})`,
@@ -298,7 +300,7 @@ export class BacklogIssueService {
     }
 
     const assigneeId = users.value.find((user) => {
-      console.debug(`[getAssigneeId] user: ${user}`);
+      console.debug(`[getAssigneeId] user: ${user.userId}`);
       return user.userId === backlogId;
     })?.id;
 
