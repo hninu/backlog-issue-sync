@@ -20084,6 +20084,8 @@ var BacklogIssueService = class {
 		if (!this.issueType || !this.priority) throw new Error(`Issue type or priority not found (issueTypeIdOrName: ${this.opts.issueTypeIdOrName}, priorityIdOrName: ${this.opts.priorityIdOrName})`);
 		const githubTag = makeGithubTag(githubIssue.number.toString(), githubIssue.html_url);
 		const assigneeId = githubIssue.assignee ? await this.getAssigneeId(githubIssue.assignee.login) : void 0;
+		const startDate = this.opts.backlogStartDate || new Date().toISOString().split("T")[0];
+		const dueDate = this.opts.backlogDueDate || new Date().toISOString().split("T")[0];
 		const createdRes = await this.api.postIssue({
 			projectId: this.projectId,
 			issueTypeId: this.issueType.id,
@@ -20091,8 +20093,8 @@ var BacklogIssueService = class {
 			summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
 			description: `${githubTag}\n\n${githubIssue.body || ""}`,
 			assigneeId,
-			startDate: this.opts.backlogStartDate ? this.opts.backlogStartDate === "today" ? new Date().toISOString() : new Date(this.opts.backlogStartDate).toISOString() : void 0,
-			dueDate: this.opts.backlogDueDate ? this.opts.backlogDueDate === "today" ? new Date().toISOString() : new Date(this.opts.backlogDueDate).toISOString() : void 0
+			startDate,
+			dueDate
 		});
 		if (createdRes.isErr()) throw new Error(`Failed to create issue (projectId: ${this.projectId}, issueTypeId: ${this.issueType.id}, priorityId: ${this.priority.id})`);
 		return makeBacklogTag(createdRes.value.issueKey, this.opts.host);
@@ -20184,11 +20186,9 @@ var BacklogIssueService = class {
 	}
 	async getAssigneeId(githubId) {
 		if (this.opts.assigneeIdMap === null) return void 0;
-		console.debug(`[getAssigneeId] githubId: ${githubId}, backlogIdMap: ${this.opts.assigneeIdMap}`);
 		const backlogId = this.opts.assigneeIdMap.find((pair) => pair[0] === githubId)?.at(1);
 		if (backlogId === void 0) throw new Error(`Assignee not found (githubId: ${githubId})`);
 		const users = await this.api.getProjectUsers(this.projectId);
-		console.debug(`[getAssigneeId] users: ${users}`);
 		if (users.isErr()) {
 			console.error(users.error);
 			throw new Error("Failed to get users");

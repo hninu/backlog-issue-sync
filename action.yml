@@ -34,10 +34,10 @@ inputs:
     description: "Optional prefix to add to the Backlog issue summary"
     required: false
   backlog-start-date:
-    description: "Optional date for backlog start date. If set to 'today', uses today's date."
+    description: "Optional date for backlog start date"
     required: false
   backlog-due-date:
-    description: "Optional date for backlog due date. If set to 'today', uses today's date."
+    description: "Optional date for backlog due date"
     required: false
   include-labels:
     description: "Action runs if any of these labels are present on the issue (if not set, runs on all issues)"

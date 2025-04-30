@@ -79,6 +79,12 @@ export class BacklogIssueService {
       ? await this.getAssigneeId(githubIssue.assignee.login)
       : undefined;
 
+    const startDate =
+      this.opts.backlogStartDate || new Date().toISOString().split("T")[0];
+
+    const dueDate =
+      this.opts.backlogDueDate || new Date().toISOString().split("T")[0];
+
     const createdRes = await this.api.postIssue({
       projectId: this.projectId,
       issueTypeId: this.issueType.id,
@@ -86,16 +92,8 @@ export class BacklogIssueService {
       summary: `${this.opts.summaryPrefix || ""}${githubIssue.title}`,
       description: `${githubTag}\n\n${githubIssue.body || ""}`,
       assigneeId: assigneeId,
-      startDate: this.opts.backlogStartDate
-        ? this.opts.backlogStartDate === "today"
-          ? new Date().toISOString()
-          : new Date(this.opts.backlogStartDate).toISOString()
-        : undefined,
-      dueDate: this.opts.backlogDueDate
-        ? this.opts.backlogDueDate === "today"
-          ? new Date().toISOString()
-          : new Date(this.opts.backlogDueDate).toISOString()
-        : undefined,
+      startDate: startDate,
+      dueDate: dueDate,
     });
 
     if (createdRes.isErr()) {
@@ -282,9 +280,6 @@ export class BacklogIssueService {
 
   private async getAssigneeId(githubId: string): Promise<number | undefined> {
     if (this.opts.assigneeIdMap === null) return undefined;
-    console.debug(
-      `[getAssigneeId] githubId: ${githubId}, backlogIdMap: ${this.opts.assigneeIdMap}`,
-    );
 
     const backlogId = this.opts.assigneeIdMap
       .find((pair) => pair[0] === githubId)
@@ -295,7 +290,6 @@ export class BacklogIssueService {
     }
 
     const users = await this.api.getProjectUsers(this.projectId);
-    console.debug(`[getAssigneeId] users: ${users}`);
 
     if (users.isErr()) {
       console.error(users.error);

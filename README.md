@@ -78,8 +78,8 @@ jobs:
 | `backlog-initial-status`  | Yes      | Status ID or name for new Backlog issues                                                 | None    |
 | `backlog-completed-status`| Yes      | Status ID or name for completed Backlog issues                                           | None    |
 | `backlog-summary-prefix`  | -        | Optional prefix for Backlog issue summary                                                | None    |
-| `backlog-start-date`      | -        | Optional date for backlog start date. If set to 'today', uses today's date.              | None    |
-| `backlog-due-date`        | -        | Optional date for backlog due date. If set to 'today', uses today's date.                | None    |
+| `backlog-start-date`      | -        | Optional date for backlog start date. If not set, uses GitHub issue created date.        | None    |
+| `backlog-due-date`        | -        | Optional date for backlog due date. If not set, uses GitHub issue created date.          | None    |
 | `include-labels`          | -        | Comma-separated label names: Action runs if any of these labels are present on the issue | None    |
 | `include-types`           | -        | Filter GitHub issues by type (e.g. Bug, Task)                                            | None    |
 | `assigneeIdMap`           | -        | Mapping between GitHub ID and Backlog user ID or names for assignee                      | None    |
