@@ -297,14 +297,14 @@ export class BacklogIssueService {
     }
 
     const assignee = users.value.find((user) => {
-      return user.userId === backlogId || user.name.trim() === backlogId.trim();
+      return user.userId === backlogId || user.name === backlogId;
     });
 
     if (assignee === undefined) {
       console.warn(
         `Assignee not found (backlogId: ${backlogId})`,
         JSON.stringify(
-          users.value.map((user) => `${user.name.trim()}(${user.userId})`),
+          users.value.map((user) => `${user.name}(${user.userId})`),
           null,
           2,
         ),

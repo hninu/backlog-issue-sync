@@ -20194,10 +20194,10 @@ var BacklogIssueService = class {
 			throw new Error("Failed to get users");
 		}
 		const assignee = users.value.find((user) => {
-			return user.userId === backlogId || user.name.trim() === backlogId.trim();
+			return user.userId === backlogId || user.name === backlogId;
 		});
 		if (assignee === void 0) {
-			console.warn(`Assignee not found (backlogId: ${backlogId})`, JSON.stringify(users.value.map((user) => `${user.name.trim()}(${user.userId})`), null, 2));
+			console.warn(`Assignee not found (backlogId: ${backlogId})`, JSON.stringify(users.value.map((user) => `${user.name}(${user.userId})`), null, 2));
 			return void 0;
 		}
 		console.info(`Matched backlog user ID: ${assignee?.id}(${assignee?.name})`);
@@ -23380,7 +23380,7 @@ var Input = class {
 		const input = this.getMultilineInput("assignee-id-map");
 		if (input.length === 0) return null;
 		return input.map((line) => {
-			const trimmed = line.trim();
+			const trimmed = line.trim().replaceAll(" ", "");
 			const matches = trimmed.match(/@(\S+)/g);
 			if (matches && matches.length >= 2) return [matches[0].replace("@", ""), matches[1].replace("@", "")];
 			return null;
