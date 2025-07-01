@@ -47,7 +47,7 @@ export class Input {
     }
     return input
       .map((line) => {
-        const trimmed = line.trim().replaceAll(" ", "");
+        const trimmed = line.trim();
         const matches = trimmed.match(/@(\S+)/g);
         if (matches && matches.length >= 2) {
           return [matches[0].replace("@", ""), matches[1].replace("@", "")];

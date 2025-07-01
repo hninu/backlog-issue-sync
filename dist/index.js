@@ -23380,7 +23380,7 @@ var Input = class {
 		const input = this.getMultilineInput("assignee-id-map");
 		if (input.length === 0) return null;
 		return input.map((line) => {
-			const trimmed = line.trim().replaceAll(" ", "");
+			const trimmed = line.trim();
 			const matches = trimmed.match(/@(\S+)/g);
 			if (matches && matches.length >= 2) return [matches[0].replace("@", ""), matches[1].replace("@", "")];
 			return null;
