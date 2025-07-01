@@ -300,6 +300,14 @@ export class BacklogIssueService {
       return user.userId === backlogId || user.name.trim() === backlogId;
     });
 
+    if (assignee === undefined) {
+      console.warn(
+        `Assignee not found (backlogId: ${backlogId})`,
+        JSON.stringify(users.value, null, 2),
+      );
+      return undefined;
+    }
+
     console.info(`Matched backlog user ID: ${assignee?.id}(${assignee?.name})`);
     return assignee?.id;
   }

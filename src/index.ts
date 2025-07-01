@@ -41,11 +41,11 @@ export async function run(): Promise<void> {
     }
 
     // --- handle issue ---
+    const existBacklogTag = extractBacklogTag(issue.body || "");
 
     // Handle issue reopened event
     if (issue.state === "open" && issue.state_reason === "reopened") {
       // Check for existing Backlog tag in issue body
-      const existBacklogTag = extractBacklogTag(issue.body || "");
 
       // If no Backlog tag, treat as newly opened
       if (existBacklogTag === null) {
@@ -59,9 +59,6 @@ export async function run(): Promise<void> {
 
     // Handle issue opened or edited event
     if (issue.state === "open") {
-      // Check for existing Backlog tag in issue body
-      const existBacklogTag = extractBacklogTag(issue.body || "");
-
       // If no Backlog tag, treat as newly opened
       if (existBacklogTag === null) {
         const tag = await handleOpen({ issue, repo });

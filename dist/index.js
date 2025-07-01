@@ -20196,6 +20196,10 @@ var BacklogIssueService = class {
 		const assignee = users.value.find((user) => {
 			return user.userId === backlogId || user.name.trim() === backlogId;
 		});
+		if (assignee === void 0) {
+			console.warn(`Assignee not found (backlogId: ${backlogId})`, JSON.stringify(users.value, null, 2));
+			return void 0;
+		}
 		console.info(`Matched backlog user ID: ${assignee?.id}(${assignee?.name})`);
 		return assignee?.id;
 	}
@@ -23490,8 +23494,8 @@ async function run() {
 		const validator = new Validator(issue$1, opts);
 		if (!validator.someIncludeLabels()) return import_core.info("Skipped: none of the include-labels found on this issue.");
 		if (!validator.someIncludeTypes()) return import_core.info("Skipped: none of the include-types found on this issue.");
+		const existBacklogTag = extractBacklogTag(issue$1.body || "");
 		if (issue$1.state === "open" && issue$1.state_reason === "reopened") {
-			const existBacklogTag = extractBacklogTag(issue$1.body || "");
 			if (existBacklogTag === null) {
 				const tag$1 = await handleOpen({
 					issue: issue$1,
@@ -23503,7 +23507,6 @@ async function run() {
 			return import_core.info(`Finished handling reopened issue: ${tag}`);
 		}
 		if (issue$1.state === "open") {
-			const existBacklogTag = extractBacklogTag(issue$1.body || "");
 			if (existBacklogTag === null) {
 				const tag$1 = await handleOpen({
 					issue: issue$1,
