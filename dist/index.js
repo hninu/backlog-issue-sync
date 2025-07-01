@@ -20194,7 +20194,7 @@ var BacklogIssueService = class {
 			throw new Error("Failed to get users");
 		}
 		const assignee = users.value.find((user) => {
-			return user.userId === backlogId || user.name.trim() === backlogId;
+			return user.userId === backlogId || user.name.trim() === backlogId.trim();
 		});
 		if (assignee === void 0) {
 			console.warn(`Assignee not found (backlogId: ${backlogId})`, JSON.stringify(users.value, null, 2));

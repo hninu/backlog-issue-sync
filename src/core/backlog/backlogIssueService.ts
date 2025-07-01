@@ -297,7 +297,7 @@ export class BacklogIssueService {
     }
 
     const assignee = users.value.find((user) => {
-      return user.userId === backlogId || user.name.trim() === backlogId;
+      return user.userId === backlogId || user.name.trim() === backlogId.trim();
     });
 
     if (assignee === undefined) {
