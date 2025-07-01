@@ -303,7 +303,11 @@ export class BacklogIssueService {
     if (assignee === undefined) {
       console.warn(
         `Assignee not found (backlogId: ${backlogId})`,
-        JSON.stringify(users.value, null, 2),
+        JSON.stringify(
+          users.value.map((user) => `${user.name.trim()}(${user.userId})`),
+          null,
+          2,
+        ),
       );
       return undefined;
     }

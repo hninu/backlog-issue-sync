@@ -20197,7 +20197,7 @@ var BacklogIssueService = class {
 			return user.userId === backlogId || user.name.trim() === backlogId.trim();
 		});
 		if (assignee === void 0) {
-			console.warn(`Assignee not found (backlogId: ${backlogId})`, JSON.stringify(users.value, null, 2));
+			console.warn(`Assignee not found (backlogId: ${backlogId})`, JSON.stringify(users.value.map((user) => `${user.name.trim()}(${user.userId})`), null, 2));
 			return void 0;
 		}
 		console.info(`Matched backlog user ID: ${assignee?.id}(${assignee?.name})`);
