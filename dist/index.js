@@ -20187,7 +20187,10 @@ var BacklogIssueService = class {
 	async getAssigneeId(githubId) {
 		if (this.opts.assigneeIdMap === null) return void 0;
 		const backlogId = this.opts.assigneeIdMap.find((pair) => pair[0] === githubId)?.at(1);
-		if (backlogId === void 0) throw new Error(`Assignee not found (githubId: ${githubId})`);
+		if (backlogId === void 0) {
+			console.warn(`Assignee not found (githubId: ${githubId})`);
+			return void 0;
+		}
 		const users = await this.api.getProjectUsers(this.projectId);
 		if (users.isErr()) {
 			console.error(users.error);

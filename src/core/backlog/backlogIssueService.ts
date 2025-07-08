@@ -286,7 +286,8 @@ export class BacklogIssueService {
       ?.at(1);
 
     if (backlogId === undefined) {
-      throw new Error(`Assignee not found (githubId: ${githubId})`);
+      console.warn(`Assignee not found (githubId: ${githubId})`);
+      return undefined;
     }
 
     const users = await this.api.getProjectUsers(this.projectId);
