@@ -34,7 +34,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "1.11.1",
+    "@actions/core": "3.0.0",
     "@actions/github": "6.0.0",
     "backlog-js": "0.13.3",
     "isomorphic-fetch": "3.0.0",
